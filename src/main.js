@@ -870,8 +870,12 @@ async function runPipeline() {
     
     function getLayerSources() {
       if (allAvailableSources.length === 0) return S.source;
-      const shuffled = [...allAvailableSources].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, 2).join(' & ');
+      const pool = [...allAvailableSources];
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      return pool.slice(0, 2).join(' & ');
     }
 
     // L1 CONTEXT — uses secondary model for independent perspective
@@ -1753,6 +1757,23 @@ const CITE = 'Cite sources precisely: Quran as Surah name and number:ayah; Hadit
 // Settings stored in localStorage under 'am_settings'
 // ================================================================
 
+const DEFAULT_MODELS = {
+  primary: {
+    anthropic: 'claude-opus-4-8',
+    local: 'google/gemma-4-26B-A4B-it',
+    groq: 'llama-3.3-70b-versatile',
+    openrouter: 'anthropic/claude-opus-4.8',
+    free: 'meta-llama/llama-3.3-70b-instruct:free',
+  },
+  secondary: {
+    anthropic: 'claude-haiku-4-5',
+    local: 'google/gemma-4-26B-A4B-it',
+    groq: 'llama-3.1-8b-instant',
+    openrouter: 'anthropic/claude-haiku-4.5',
+    free: 'qwen/qwen3-next-80b-a3b-instruct:free',
+  },
+};
+
 function getApiSettings() {
   try { return JSON.parse(localStorage.getItem('am_settings') || '{}'); } catch { return {}; }
 }
@@ -1760,21 +1781,13 @@ function getApiSettings() {
 function getPrimaryModel() {
   const s = getApiSettings();
   const provider = s.primaryProvider || 'local';
-  if (provider === 'anthropic') return s.primaryModel || 'claude-opus-4-8';
-  if (provider === 'local') return s.primaryModel || 'google/gemma-4-26B-A4B-it';
-  if (provider === 'groq') return s.primaryModel || 'llama-3.3-70b-versatile';
-  if (provider === 'openrouter') return s.primaryModel || 'anthropic/claude-opus-4.8';
-  return s.primaryModel || 'meta-llama/llama-3.3-70b-instruct:free';
+  return s.primaryModel || DEFAULT_MODELS.primary[provider] || DEFAULT_MODELS.primary.free;
 }
 
 function getSecondaryModel() {
   const s = getApiSettings();
   const provider = s.secondaryProvider || 'groq';
-  if (provider === 'anthropic') return s.secondaryModel || 'claude-haiku-4-5';
-  if (provider === 'local') return s.secondaryModel || 'google/gemma-4-26B-A4B-it';
-  if (provider === 'groq') return s.secondaryModel || 'llama-3.1-8b-instant';
-  if (provider === 'openrouter') return s.secondaryModel || 'anthropic/claude-haiku-4.5';
-  return s.secondaryModel || 'qwen/qwen3-next-80b-a3b-instruct:free';
+  return s.secondaryModel || DEFAULT_MODELS.secondary[provider] || DEFAULT_MODELS.secondary.free;
 }
 
 // Retry transient failures (rate limit / overloaded) up to 2 times.

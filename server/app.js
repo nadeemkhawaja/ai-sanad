@@ -2,8 +2,8 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import https from 'https';
 import multer from 'multer';
+import dotenv from 'dotenv';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -12,22 +12,16 @@ const pdfParse = require('pdf-parse');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
 
-// ── Load .env ──────────────────────────────────────────────
-export function loadEnv() {
-  const envPath = path.join(rootDir, '.env');
-  if (!fs.existsSync(envPath)) return;
-  for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eq = trimmed.indexOf('=');
-    if (eq === -1) continue;
-    const key = trimmed.slice(0, eq).trim();
-    const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
-    process.env[key] = process.env[key] ?? val;
-  }
-}
+dotenv.config({ path: path.join(rootDir, '.env') });
 
-loadEnv();
+function isPrivateHost(hostname) {
+  const h = hostname.toLowerCase();
+  if (h === 'localhost' || h === '::1') return true;
+  const m = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!m) return false;
+  const [a, b] = m.slice(1).map(Number);
+  return a === 127 || a === 10 || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31);
+}
 
 const app = express();
 // No CORS middleware: the UI is served same-origin (Vite proxies /api in dev),
@@ -125,6 +119,10 @@ app.post('/api/local', async (req, res) => {
   try { url = new URL(urlStr); }
   catch { return res.status(400).json({ error: 'Invalid local endpoint URL' }); }
 
+  if (!isPrivateHost(url.hostname)) {
+    return res.status(400).json({ error: 'Local model endpoint must be a localhost or private-network address.' });
+  }
+
   const targetModel = model || process.env.LOCAL_LLM_MODEL || 'llama3.2';
   // If baseUrl already includes /v1, just append /chat/completions
   const fetchUrl = urlStr.replace(/\/$/, '').endsWith('/v1')
@@ -215,8 +213,20 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage, limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
 
+const UPLOAD_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+function cleanupOldUploads() {
+  const now = Date.now();
+  for (const f of fs.readdirSync(uploadDir)) {
+    const fp = path.join(uploadDir, f);
+    try {
+      if (now - fs.statSync(fp).mtimeMs > UPLOAD_MAX_AGE_MS) fs.unlinkSync(fp);
+    } catch {}
+  }
+}
+
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  cleanupOldUploads();
   const file = req.file;
   try {
     let text = '';
@@ -224,11 +234,14 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     if (file.originalname.endsWith('.pdf')) {
       const data = await pdfParse(fileBuffer);
       text = data.text;
-    } else if (file.originalname.endsWith('.md') || file.originalname.endsWith('.txt') || file.originalname.endsWith('.doc') || file.originalname.endsWith('.docx')) {
-      // NOTE: For a real app, .doc/.docx require mammoth or similar. We'll fallback to string extract.
+    } else if (file.originalname.endsWith('.md') || file.originalname.endsWith('.txt')) {
       text = fileBuffer.toString('utf8');
+    } else if (file.originalname.endsWith('.doc') || file.originalname.endsWith('.docx')) {
+      fs.unlinkSync(file.path);
+      return res.status(400).json({ error: '.doc/.docx are not supported. Please convert to .pdf, .md, or .txt.' });
     } else {
-      return res.status(400).json({ error: 'Unsupported file type. Only .pdf and .md are allowed.' });
+      fs.unlinkSync(file.path);
+      return res.status(400).json({ error: 'Unsupported file type. Only .pdf, .md, and .txt are allowed.' });
     }
     return res.json({ text });
   } catch (err) {
