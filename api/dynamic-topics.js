@@ -33,6 +33,10 @@ export default async function handler(req, res) {
       }
       if (!db[subId]) db[subId] = [];
       db[subId].push(topic);
+      // Cap per-subcategory history — fetched in full on every page load,
+      // appended to every ~3s of app usage, so uncapped it grows unbounded.
+      const DYNAMIC_TOPICS_CAP = 20;
+      if (db[subId].length > DYNAMIC_TOPICS_CAP) db[subId] = db[subId].slice(-DYNAMIC_TOPICS_CAP);
       fs.writeFileSync(TOPICS_DB_PATH, JSON.stringify(db, null, 2));
 
       return res.json({ success: true, db });

@@ -323,7 +323,12 @@ app.post('/api/dynamic-topics', express.json(), (req, res) => {
     
     if (!db[subId]) db[subId] = [];
     db[subId].push(topic);
-    
+    // Cap per-subcategory history — this file is fetched in full on every
+    // page load (see /api/dynamic-topics GET), and a background task appends
+    // to it every ~3s of app usage, so uncapped it grows without bound.
+    const DYNAMIC_TOPICS_CAP = 20;
+    if (db[subId].length > DYNAMIC_TOPICS_CAP) db[subId] = db[subId].slice(-DYNAMIC_TOPICS_CAP);
+
     if (!fs.existsSync(path.join(rootDir, 'data'))) {
       fs.mkdirSync(path.join(rootDir, 'data'), { recursive: true });
     }

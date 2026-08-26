@@ -21,79 +21,79 @@ function esc(str) {
 // ================================================================
 const CATS = [
   {
-    id:'quran', label:'Quran', label_ur:'قرآن', label_ar:'القرآن', accent:'#136b4f',
+    id:'quran', label:'Quran', accent:'#136b4f',
     subs:[
-      { id:'quranic_sciences', label:'Quranic Sciences', label_ur:'قرآنی علوم', label_ar:'علوم القرآن', sources:['Tafsir Ibn Kathir', 'Tafsir al-Jalalayn', 'Al-Qurtubi', 'Al-Tabari', 'Tafsir Al-Sa\'di', 'Baghawi', 'Maariful Quran', 'Tafhim-ul-Quran', 'Al-Kashshaf', 'Fi Zilal al-Quran'],
+      { id:'quranic_sciences', label:'Quranic Sciences', sources:['Tafsir Ibn Kathir', 'Tafsir al-Jalalayn', 'Al-Qurtubi', 'Al-Tabari', 'Tafsir Al-Sa\'di', 'Baghawi', 'Maariful Quran', 'Tafhim-ul-Quran', 'Al-Kashshaf', 'Fi Zilal al-Quran'],
         topics:[
-          {title:'Interpretation of Ayatul Kursi', title_ur:'آیۃ الکرسی کی تفسیر', title_ar:'تفسير آية الكرسي', sub:'Understanding the greatest verse', sub_ur:'عظیم ترین آیت کو سمجھنا', sub_ar:'فهم أعظم آية', positions:['Literal Attributes (Bila Kayf)', 'Metaphorical Interpretation (Ta\'wil)']},
-          {title:'Abrogation (Naskh) in the Quran', title_ur:'قرآن میں ناسخ و منسوخ', title_ar:'النسخ في القرآن', sub:'Do later verses cancel earlier ones?', sub_ur:'کیا بعد والی آیات پہلی آیات کو منسوخ کرتی ہیں؟', sub_ar:'هل تلغي الآيات اللاحقة الآيات السابقة؟', positions:['Naskh applies to legal rulings', 'Naskh only applies to previous scriptures, not within Quran']},
-          {title:'Asbab al-Nuzul (Context of Revelation)', title_ur:'اسباب نزول (وحی کا پس منظر)', title_ar:'أسباب النزول', sub:'Is historical context binding?', sub_ur:'کیا تاریخی پس منظر لازمی ہے؟', sub_ar:'هل السياق التاريخي ملزم؟', positions:['Crucial for restricting general rulings', 'Secondary to the universal, general meaning of the text']},
-          {title:'The Seven Ahruf', title_ur:'سات حروف (قراءت)', title_ar:'الأحرف السبعة', sub:'Modes of Recitation', sub_ur:'تلاوت کے طریقے', sub_ar:'طرق التلاوة', positions:['Distinct dialects of Arabic tribes', 'Different synonyms and wordings allowed for ease']}
+          {title:'Interpretation of Ayatul Kursi', sub:'Understanding the greatest verse', positions:['Literal Attributes (Bila Kayf)', 'Metaphorical Interpretation (Ta\'wil)']},
+          {title:'Abrogation (Naskh) in the Quran', sub:'Do later verses cancel earlier ones?', positions:['Naskh applies to legal rulings', 'Naskh only applies to previous scriptures, not within Quran']},
+          {title:'Asbab al-Nuzul (Context of Revelation)', sub:'Is historical context binding?', positions:['Crucial for restricting general rulings', 'Secondary to the universal, general meaning of the text']},
+          {title:'The Seven Ahruf', sub:'Modes of Recitation', positions:['Distinct dialects of Arabic tribes', 'Different synonyms and wordings allowed for ease']}
         ]
       },
-      { id:'theology_in_quran', label:'Theology in the Quran', label_ur:'قرآن میں عقیدہ', label_ar:'العقيدة في القرآن', sources:['Al-Aqidah al-Tahawiyyah', 'Sharh al-Fiqh al-Akbar', 'Al-Ghazali'],
+      { id:'theology_in_quran', label:'Theology in the Quran', sources:['Al-Aqidah al-Tahawiyyah', 'Sharh al-Fiqh al-Akbar', 'Al-Ghazali'],
         topics:[
-          {title:'Free Will vs Predestination (Qadar)', title_ur:'جبر و قدر (تقدیر)', title_ar:'الجبر والاختيار (القدر)', sub:'Who creates human actions?', sub_ur:'انسانی اعمال کا خالق کون ہے؟', sub_ar:'من يخلق أفعال الإنسان؟', positions:['Everything is preordained (Jabariyyah)', 'Humans have absolute free will (Qadariyyah)', 'Kasb (acquisition) balances both (Ash\'ari)']},
-          {title:'The Concept of Tawhid', title_ur:'توحید کا تصور', title_ar:'مفهوم التوحيد', sub:'Focus of Islamic monotheism', sub_ur:'اسلامی توحید کا مرکز', sub_ar:'محور التوحيد الإسلامي', positions:['Focus heavily on Tawhid al-Rububiyyah (Lordship)', 'Focus on Tawhid al-Uluhiyyah (Worship) and Attributes']}
+          {title:'Free Will vs Predestination (Qadar)', sub:'Who creates human actions?', positions:['Everything is preordained (Jabariyyah)', 'Humans have absolute free will (Qadariyyah)', 'Kasb (acquisition) balances both (Ash\'ari)']},
+          {title:'The Concept of Tawhid', sub:'Focus of Islamic monotheism', positions:['Focus heavily on Tawhid al-Rububiyyah (Lordship)', 'Focus on Tawhid al-Uluhiyyah (Worship) and Attributes']}
         ]
       },
-      { id:'quranic_ethics', label:'Quranic Ethics', label_ur:'قرآنی اخلاقیات', label_ar:'الأخلاق القرآنية', sources:['Ihya Ulum al-Din', 'Al-Akhlaq wa\'l-Siyar'],
+      { id:'quranic_ethics', label:'Quranic Ethics', sources:['Ihya Ulum al-Din', 'Al-Akhlaq wa\'l-Siyar'],
         topics:[
-          {title:'Justice vs Mercy in Punishment', title_ur:'سزا میں انصاف بمقابلہ رحم', title_ar:'العدل مقابل الرحمة في العقاب', sub:'Applying penal codes', sub_ur:'سزاؤں کا نفاذ', sub_ar:'تطبيق القوانين الجنائية', positions:['Strict adherence to prescribed penalties achieves justice', 'Prioritization of rehabilitation and mercy aligns with Quranic ethos']},
-          {title:'Wealth and Charity (Zakat)', title_ur:'دولت اور صدقہ (زکوٰۃ)', title_ar:'الثروة والصدقة (الزكاة)', sub:'The philosophy of wealth', sub_ur:'دولت کا فلسفہ', sub_ar:'فلسفة الثروة', positions:['Wealth is a trial; charity is mandatory purification', 'Wealth is a blessing to be enjoyed and invested responsibly']}
+          {title:'Justice vs Mercy in Punishment', sub:'Applying penal codes', positions:['Strict adherence to prescribed penalties achieves justice', 'Prioritization of rehabilitation and mercy aligns with Quranic ethos']},
+          {title:'Wealth and Charity (Zakat)', sub:'The philosophy of wealth', positions:['Wealth is a trial; charity is mandatory purification', 'Wealth is a blessing to be enjoyed and invested responsibly']}
         ]
       }
     ]
   },
   {
-    id:'hadith', label:'Hadith', label_ur:'حدیث', label_ar:'الحديث', accent:'#075985',
+    id:'hadith', label:'Hadith', accent:'#075985',
     subs:[
-      { id:'hadith_methodology', label:'Hadith Methodology (Mustalah)', label_ur:'اصول حدیث (مصطلح)', label_ar:'مصطلح الحديث', sources:['Muqaddimah Ibn al-Salah', 'Nukhbat al-Fikar', 'Al-Risalah', 'Al-Kifayah fi Ilm al-Riwayah', 'Tadrib al-Rawi', 'Fath al-Mughith', 'Qawaid al-Tahdith', 'Manhaj al-Naqd', 'Sunnah.com', 'Dorar.net'],
+      { id:'hadith_methodology', label:'Hadith Methodology (Mustalah)', sources:['Muqaddimah Ibn al-Salah', 'Nukhbat al-Fikar', 'Al-Risalah', 'Al-Kifayah fi Ilm al-Riwayah', 'Tadrib al-Rawi', 'Fath al-Mughith', 'Qawaid al-Tahdith', 'Manhaj al-Naqd', 'Sunnah.com', 'Dorar.net'],
         topics:[
-          {title:'Authenticity of Ahad (Solitary) Hadith', title_ur:'خبر واحد (انفرادی حدیث) کی استناد', title_ar:'حجية حديث الآحاد', sub:'Are solitary narrations binding?', sub_ur:'کیا انفرادی روایات لازمی ہیں؟', sub_ar:'هل روايات الآحاد ملزمة؟', positions:['Binding in both theology (Aqidah) and law (Fiqh)', 'Binding in law only, not theology', 'Not binding if they contradict established reason or Quran']},
-          {title:'Criteria for a Sahih Hadith', title_ur:'صحیح حدیث کے معیار', title_ar:'معايير الحديث الصحيح', sub:'Evaluating narrations', sub_ur:'روایات کا جائزہ', sub_ar:'تقييم الروايات', positions:['Strict Isnad (chain) verification is sufficient', 'Matn (text) criticism and logical consistency are equally important']},
-          {title:'The Role of Weak (Da\'if) Hadith', title_ur:'ضعیف حدیث کا کردار', title_ar:'دور الحديث الضعيف', sub:'Can weak hadith be used?', sub_ur:'کیا ضعیف حدیث استعمال کی جا سکتی ہے؟', sub_ar:'هل يمكن استخدام الحديث الضعيف؟', positions:['Acceptable for virtuous deeds (Fada\'il al-A\'mal)', 'Completely rejected in all matters of religion']}
+          {title:'Authenticity of Ahad (Solitary) Hadith', sub:'Are solitary narrations binding?', positions:['Binding in both theology (Aqidah) and law (Fiqh)', 'Binding in law only, not theology', 'Not binding if they contradict established reason or Quran']},
+          {title:'Criteria for a Sahih Hadith', sub:'Evaluating narrations', positions:['Strict Isnad (chain) verification is sufficient', 'Matn (text) criticism and logical consistency are equally important']},
+          {title:'The Role of Weak (Da\'if) Hadith', sub:'Can weak hadith be used?', positions:['Acceptable for virtuous deeds (Fada\'il al-A\'mal)', 'Completely rejected in all matters of religion']}
         ]
       },
-      { id:'sahih_compilations', label:'Major Compilations', label_ur:'اہم کتب احادیث', label_ar:'الكتب الستة والمصنفات', sources:['Sahih Bukhari', 'Sahih Muslim', 'Sunan Abu Dawud', 'Muwatta Malik'],
+      { id:'sahih_compilations', label:'Major Compilations', sources:['Sahih Bukhari', 'Sahih Muslim', 'Sunan Abu Dawud', 'Muwatta Malik'],
         topics:[
-          {title:'Comparing Bukhari and Muslim', title_ur:'بخاری اور مسلم کا موازنہ', title_ar:'المقارنة بين البخاري ومسلم', sub:'Which is superior?', sub_ur:'کون سی کتاب برتر ہے؟', sub_ar:'أيهما أفضل؟', positions:['Bukhari\'s strict conditions of meeting make it superior', 'Muslim\'s logical arrangement and textual variations make it superior']},
-          {title:'Contextualizing Prophetic Actions', title_ur:'نبوی افعال کا سیاق و سباق', title_ar:'سياق الأفعال النبوية', sub:'Universal vs Contextual', sub_ur:'آفاقی بمقابلہ سیاق و سباق کے مطابق', sub_ar:'عالمي مقابل سياقي', positions:['All Prophetic actions are universal and timeless laws', 'Many actions must be understood in their 7th-century Arabian cultural context']}
+          {title:'Comparing Bukhari and Muslim', sub:'Which is superior?', positions:['Bukhari\'s strict conditions of meeting make it superior', 'Muslim\'s logical arrangement and textual variations make it superior']},
+          {title:'Contextualizing Prophetic Actions', sub:'Universal vs Contextual', positions:['All Prophetic actions are universal and timeless laws', 'Many actions must be understood in their 7th-century Arabian cultural context']}
         ]
       },
-      { id:'fiqh_al_hadith', label:'Jurisprudence from Hadith', label_ur:'حدیث سے فقہ', label_ar:'فقه الحديث', sources:['Bidayat al-Mujtahid', 'Umdat al-Ahkam', 'Subul al-Salam'],
+      { id:'fiqh_al_hadith', label:'Jurisprudence from Hadith', sources:['Bidayat al-Mujtahid', 'Umdat al-Ahkam', 'Subul al-Salam'],
         topics:[
-          {title:'Actions Judged by Intentions', title_ur:'اعمال کا دارومدار نیتوں پر ہے', title_ar:'إنما الأعمال بالنيات', sub:'Inner intent vs outer form', sub_ur:'اندرونی نیت بمقابلہ ظاہری شکل', sub_ar:'النية الداخلية مقابل الشكل الخارجي', positions:['Inner sincere intent validates the action entirely', 'Outer correct form is strictly required alongside inner intent']},
-          {title:'Customs (Urf) vs Text (Nass)', title_ur:'رواج (عرف) بمقابلہ نص (متن)', title_ar:'العرف مقابل النص', sub:'Resolving conflicts', sub_ur:'تنازعات کا حل', sub_ar:'حل التعارض', positions:['Text always supersedes local custom', 'Local custom can restrict or modify the application of text']}
+          {title:'Actions Judged by Intentions', sub:'Inner intent vs outer form', positions:['Inner sincere intent validates the action entirely', 'Outer correct form is strictly required alongside inner intent']},
+          {title:'Customs (Urf) vs Text (Nass)', sub:'Resolving conflicts', positions:['Text always supersedes local custom', 'Local custom can restrict or modify the application of text']}
         ]
       }
     ]
   },
   {
-    id:'islamqa', label:'Islam QA', label_ur:'اسلام سوال و جواب', label_ar:'فتاوى إسلامية', accent:'#9a3009',
+    id:'islamqa', label:'Islam QA', accent:'#9a3009',
     subs:[
-      { id:'fatwa_councils', label:'Fatwa Councils & Q&A', label_ur:'فتاویٰ کونسلز اور سوال و جواب', label_ar:'لجان الفتوى والأسئلة والأجوبة', sources:['IslamQA.info', 'SeekersGuidance', 'Dar al-Ifta al-Misriyyah', 'AMJA Online', 'IslamWeb', 'Yaqeen Institute', 'AlMaghrib Institute', 'Assembly of Muslim Jurists', 'European Council for Fatwa', 'E-Fatwa (Malaysia)'],
+      { id:'fatwa_councils', label:'Fatwa Councils & Q&A', sources:['IslamQA.info', 'SeekersGuidance', 'Dar al-Ifta al-Misriyyah', 'AMJA Online', 'IslamWeb', 'Yaqeen Institute', 'AlMaghrib Institute', 'Assembly of Muslim Jurists', 'European Council for Fatwa', 'E-Fatwa (Malaysia)'],
         topics:[
-          {title:'Methodology of Issuing Fatwa', title_ur:'فتویٰ جاری کرنے کا طریقہ کار', title_ar:'منهجية إصدار الفتوى', sub:'Adherence to Madhab vs direct evidence', sub_ur:'مذہب کی پیروی بمقابلہ براہ راست ثبوت', sub_ar:'الالتزام بالمذهب مقابل الدليل المباشر', positions:['Must strictly follow one of the four established Madhabs', 'Should extract rulings directly from Quran and Sunnah if capable']}
+          {title:'Methodology of Issuing Fatwa', sub:'Adherence to Madhab vs direct evidence', positions:['Must strictly follow one of the four established Madhabs', 'Should extract rulings directly from Quran and Sunnah if capable']}
         ]
       }
     ]
   },
   {
-    id:'top_questions', label:'Top 10 Questions', label_ur:'اہم 10 سوالات', label_ar:'أهم 10 أسئلة', accent:'#6b21a8',
+    id:'top_questions', label:'Top 10 Questions', accent:'#6b21a8',
     subs:[
-      { id:'modern_challenges', label:'Modern Challenges & Theology', label_ur:'جدید چیلنجز اور عقیدہ', label_ar:'التحديات المعاصرة والعقيدة', sources:['Yaqeen Institute', 'Al-Ghazali', 'Contemporary Scholars'],
+      { id:'modern_challenges', label:'Modern Challenges & Theology', sources:['Yaqeen Institute', 'Al-Ghazali', 'Contemporary Scholars'],
         topics:[
-          {title:'The Problem of Evil & Suffering', title_ur:'برائی اور مصائب کا مسئلہ', title_ar:'مشكلة الشر والمعاناة', sub:'If God is Merciful, why is there suffering?', sub_ur:'اگر خدا رحیم ہے، تو مصائب کیوں ہیں؟', sub_ar:'إذا كان الله رحيماً، فلماذا توجد معاناة؟', positions:['Suffering is a test and elevates spiritual rank', 'We lack the full perspective of God\'s overarching wisdom']},
-          {title:'Women\'s Rights in Islam', title_ur:'اسلام میں خواتین کے حقوق', title_ar:'حقوق المرأة في الإسلام', sub:'Are men and women equal?', sub_ur:'کیا مرد اور عورت برابر ہیں؟', sub_ar:'هل يتساوى الرجل والمرأة؟', positions:['Equal in spiritual worth, with complementary societal roles', 'Total egalitarianism in all legal and societal matters']},
-          {title:'Islam & Modern Science', title_ur:'اسلام اور جدید سائنس', title_ar:'الإسلام والعلم الحديث', sub:'Evolution and Cosmology', sub_ur:'ارتقاء اور کائنات', sub_ar:'التطور وعلم الكونيات', positions:['The Quran fully aligns with modern scientific discoveries', 'Science changes; the Quran is spiritual, not a science textbook']},
-          {title:'Jihad in the Modern World', title_ur:'جدید دنیا میں جہاد', title_ar:'الجهاد في العالم المعاصر', sub:'Understanding armed struggle', sub_ur:'مسلح جدوجہد کو سمجھنا', sub_ar:'فهم الكفاح المسلح', positions:['Strictly defensive and requires legitimate state authority', 'A holistic spiritual struggle (Greater Jihad) with defensive limits']},
-          {title:'Islamic Finance & Mortgages', title_ur:'اسلامی فنانس اور مارگیج', title_ar:'التمويل الإسلامي والرهن العقاري', sub:'Navigating the modern economy', sub_ur:'جدید معیشت میں رہنمائی', sub_ar:'التعامل مع الاقتصاد الحديث', positions:['Conventional mortgages are strictly forbidden (Riba)', 'Necessity (Darurah) allows standard mortgages in the West']},
-          {title:'Fate vs Free Will', title_ur:'تقدیر بمقابلہ آزاد مرضی', title_ar:'القدر مقابل حرية الإرادة', sub:'Do we actually have a choice?', sub_ur:'کیا واقعی ہمارے پاس انتخاب ہے؟', sub_ar:'هل لدينا حقاً خيار؟', positions:['God\'s knowledge does not negate our free choice', 'Our choices are illusions; all is divinely compelled']},
-          {title:'Apostasy (Riddah)', title_ur:'ارتداد (مذہب چھوڑنا)', title_ar:'الردة', sub:'Freedom of religion', sub_ur:'مذہبی آزادی', sub_ar:'حرية الدين', positions:['Traditional view of capital punishment for treason/apostasy', 'No worldly punishment; freedom of belief based on "No compulsion"']},
-          {title:'The Reality of the Hijab', title_ur:'حجاب کی حقیقت', title_ar:'حقيقة الحجاب', sub:'Is it a strict requirement?', sub_ur:'کیا یہ ایک سخت ضرورت ہے؟', sub_ar:'هل هو مطلب صارم؟', positions:['Mandatory obligation for modesty', 'A cultural recommendation rather than a strict legal requirement']},
-          {title:'Music and Arts', title_ur:'موسیقی اور فنون', title_ar:'الموسيقى والفنون', sub:'Permissibility of instruments', sub_ur:'آلات کی اجازت', sub_ar:'جواز الآلات الموسيقية', positions:['All musical instruments (except duff) are impermissible', 'Permissible as long as the lyrics and context are wholesome']},
-          {title:'Pluralism & Salvation', title_ur:'تکثیریت اور نجات', title_ar:'التعددية والخلاص', sub:'Are only Muslims saved?', sub_ur:'کیا صرف مسلمان نجات پائیں گے؟', sub_ar:'هل ينجو المسلمون فقط؟', positions:['Only those who accept Islam after hearing it properly are saved', 'God\'s mercy encompasses all sincere seekers of truth']}
+          {title:'The Problem of Evil & Suffering', sub:'If God is Merciful, why is there suffering?', positions:['Suffering is a test and elevates spiritual rank', 'We lack the full perspective of God\'s overarching wisdom']},
+          {title:'Women\'s Rights in Islam', sub:'Are men and women equal?', positions:['Equal in spiritual worth, with complementary societal roles', 'Total egalitarianism in all legal and societal matters']},
+          {title:'Islam & Modern Science', sub:'Evolution and Cosmology', positions:['The Quran fully aligns with modern scientific discoveries', 'Science changes; the Quran is spiritual, not a science textbook']},
+          {title:'Jihad in the Modern World', sub:'Understanding armed struggle', positions:['Strictly defensive and requires legitimate state authority', 'A holistic spiritual struggle (Greater Jihad) with defensive limits']},
+          {title:'Islamic Finance & Mortgages', sub:'Navigating the modern economy', positions:['Conventional mortgages are strictly forbidden (Riba)', 'Necessity (Darurah) allows standard mortgages in the West']},
+          {title:'Fate vs Free Will', sub:'Do we actually have a choice?', positions:['God\'s knowledge does not negate our free choice', 'Our choices are illusions; all is divinely compelled']},
+          {title:'Apostasy (Riddah)', sub:'Freedom of religion', positions:['Traditional view of capital punishment for treason/apostasy', 'No worldly punishment; freedom of belief based on "No compulsion"']},
+          {title:'The Reality of the Hijab', sub:'Is it a strict requirement?', positions:['Mandatory obligation for modesty', 'A cultural recommendation rather than a strict legal requirement']},
+          {title:'Music and Arts', sub:'Permissibility of instruments', positions:['All musical instruments (except duff) are impermissible', 'Permissible as long as the lyrics and context are wholesome']},
+          {title:'Pluralism & Salvation', sub:'Are only Muslims saved?', positions:['Only those who accept Islam after hearing it properly are saved', 'God\'s mercy encompasses all sincere seekers of truth']}
         ]
       }
     ]
@@ -2023,11 +2023,7 @@ It MUST NOT be any of these: ${existingTitles}.
 Return ONLY raw JSON in this exact format, with NO markdown formatting, NO backticks, NO intro or outro:
 {
   "title": "English Title",
-  "title_ur": "Urdu Translation",
-  "title_ar": "Arabic Translation",
   "sub": "English Subtitle/Question",
-  "sub_ur": "Urdu Subtitle/Question",
-  "sub_ar": "Arabic Subtitle/Question",
   "positions": ["Argument Position 1", "Argument Position 2"]
 }`;
   
