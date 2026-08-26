@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/library/search", "destination": "/api/library-search" }
+  ],
+  "functions": {
+    "api/uploads.js": {
+      "includeFiles": "data/uploads/**"
+    },
+    "api/library-search.js": {
+      "includeFiles": "data/library/**"
+    }
+  }
+}

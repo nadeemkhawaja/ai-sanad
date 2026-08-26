@@ -11,6 +11,8 @@
 <meta name="description" content="AI-Minaret — AI Reasoning Strategist. Sharpen your thinking with 5-layer AI reasoning.">
 <link rel="manifest" href="/manifest.json">
 <title>AI-Minaret — Sharpen Your Thinking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Courier+Prime:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="/src/style.css">
@@ -27,8 +29,8 @@
   <div class="masthead-top">
     <div>Est. 2025 &nbsp;·&nbsp; Vol. II &nbsp;·&nbsp; AI-Minaret</div>
     <div class="live-ticker">
-      <div class="ticker-dot"></div>
-      <span id="ticker-text">READY TO REASON</span>
+      <div class="ticker-dot" aria-hidden="true"></div>
+      <span id="ticker-text" role="status" aria-live="polite">READY TO REASON</span>
     </div>
     <div id="masthead-date" style="font-family:var(--mono);font-size:10px;"></div>
   </div>
@@ -38,24 +40,24 @@
       
       </nav>
 
-    <div class="masthead-title" onclick="scrollTo(0,0)">
+    <button type="button" class="masthead-title" onclick="scrollTo(0,0)" aria-label="AI-Minaret — back to top">
       <div class="paper-name">AI-Minaret</div>
       <div class="paper-tagline" id="masthead-tagline">Hosted by AI Scholar &nbsp;·&nbsp; Sharpen Your Thinking</div>
       <div id="masthead-models" style="font-family:var(--mono);font-size:10px;margin-top:6px;color:var(--ink3);"></div>
-    </div>
+    </button>
 
     <nav class="masthead-nav-right">
       <button class="nav-item" onclick="exportDebate('md')">Export</button>
       <button class="nav-item" onclick="copyAll()">Copy</button>
       <button class="nav-item" onclick="clearAll()">Clear</button>
-      <button class="nav-item settings-btn" onclick="openSettings()" title="API Settings">
-        ⚙
+      <button class="nav-item settings-btn" onclick="openSettings()" title="API Settings" aria-label="API settings">
+        <span aria-hidden="true">⚙</span>
       </button>
-      <div class="lang-switcher" id="lang-switcher">
-        <button class="lang-btn active" data-lang="en" onclick="switchLang('en')" title="English">🇬🇧</button>
-        <button class="lang-btn" data-lang="ar" onclick="switchLang('ar')" title="العربية">🇸🇦</button>
-        <button class="lang-btn" data-lang="ur" onclick="switchLang('ur')" title="اردو">🇵🇰</button>
-        <button class="lang-btn" data-lang="es" onclick="switchLang('es')" title="Español">🇪🇸</button>
+      <div class="lang-switcher" id="lang-switcher" role="group" aria-label="Interface language">
+        <button class="lang-btn active" data-lang="en" onclick="switchLang('en')" title="English" aria-label="English" aria-pressed="true"><span aria-hidden="true">🇬🇧</span></button>
+        <button class="lang-btn" data-lang="ar" onclick="switchLang('ar')" title="العربية" aria-label="العربية — Arabic" aria-pressed="false"><span aria-hidden="true">🇸🇦</span></button>
+        <button class="lang-btn" data-lang="ur" onclick="switchLang('ur')" title="اردو" aria-label="اردو — Urdu" aria-pressed="false"><span aria-hidden="true">🇵🇰</span></button>
+        <button class="lang-btn" data-lang="es" onclick="switchLang('es')" title="Español" aria-label="Español — Spanish" aria-pressed="false"><span aria-hidden="true">🇪🇸</span></button>
       </div>
     </nav>
   </div>
@@ -95,6 +97,7 @@
           <div class="topic-grid" id="topic-grid"></div>
 
           <div class="custom-row">
+            <label class="visually-hidden" for="custom-in">Ask your own question</label>
             <input class="custom-in" id="custom-in" placeholder="Ask your own Question" onkeydown="if(event.key==='Enter')setCustom()">
             <button class="custom-btn" onclick="setCustom()">Enter</button>
           </div>
@@ -114,11 +117,11 @@
       </div>
       <div class="config-inner">
         <div>
-          <div class="cf-label" id="cf-position-label">Your Position</div>
+          <label class="cf-label" id="cf-position-label" for="sel-pos">Your Position</label>
           <select id="sel-pos"><option value="">— Select side —</option></select>
         </div>
         <div>
-          <div class="cf-label" id="cf-persona-label">Persona</div>
+          <label class="cf-label" id="cf-persona-label" for="sel-persona">Persona</label>
           <select id="sel-persona">
             <option value="Islamic Scholar">Islamic Scholar</option>
             <option value="Historian">Historian</option>
@@ -127,7 +130,7 @@
           </select>
         </div>
         <div>
-          <div class="cf-label" id="cf-depth-label">Argument Depth</div>
+          <label class="cf-label" id="cf-depth-label" for="sel-depth">Argument Depth</label>
           <select id="sel-depth">
             <option value="10-20">Compact — 10–20 words</option>
             <option value="20-50" selected>Brief — 20–50 words</option>
@@ -136,7 +139,7 @@
           </select>
         </div>
         <div>
-          <div class="cf-label" id="cf-lang-label" style="display:none;">Language</div>
+          <label class="cf-label" id="cf-lang-label" for="sel-lang" style="display:none;">Language</label>
           <select id="sel-lang" style="display:none;">
             <option value="">English</option>
             <option value="Write your entire response in Arabic. ">Arabic</option>
@@ -148,16 +151,16 @@
           </select>
         </div>
         <div>
-          <div class="cf-label" id="cf-source-label">Knowledge Source</div>
+          <label class="cf-label" id="cf-source-label" for="sel-source-quick">Knowledge Source</label>
           <select id="sel-source-quick" onchange="S.source=this.value"></select>
         </div>
       </div>
 
-      <div class="tone-row">
+      <div class="tone-row" role="group" aria-labelledby="tone-label">
         <span class="tone-label" id="tone-label">Tone —</span>
-        <button class="tone-pill sel" data-tone="simple, plain English — short sentences, everyday words, and explain any Arabic or technical term in brackets the first time it appears">Plain English</button>
-        <button class="tone-pill" data-tone="balanced and measured">Balanced</button>
-        <button class="tone-pill" data-tone="formal and academic">Formal</button>
+        <button class="tone-pill sel" aria-pressed="true" data-tone="simple, plain English — short sentences, everyday words, and explain any Arabic or technical term in brackets the first time it appears">Plain English</button>
+        <button class="tone-pill" aria-pressed="false" data-tone="balanced and measured">Balanced</button>
+        <button class="tone-pill" aria-pressed="false" data-tone="formal and academic">Formal</button>
       </div>
     </div>
 
@@ -167,13 +170,14 @@
 
     <!-- REFERENCE DOCUMENT UPLOAD -->
     <div class="accordion" style="margin-bottom:1rem;">
-      <div class="acc-head" onclick="toggleAcc('refdoc')">
-        <div class="acc-head-left">
-          📎 Reference Documents — Upload files for ingestion
+      <button type="button" class="acc-head" onclick="toggleAcc('refdoc')"
+              id="refdoc-toggle" aria-expanded="false" aria-controls="refdoc-body">
+        <span class="acc-head-left">
+          <span aria-hidden="true">📎</span> Reference Documents — Upload files for ingestion
           <span class="acc-badge" id="refdoc-badge">NONE</span>
-        </div>
-        <span class="acc-arrow" id="refdoc-arrow">▼</span>
-      </div>
+        </span>
+        <span class="acc-arrow" id="refdoc-arrow" aria-hidden="true">▼</span>
+      </button>
       <div class="acc-body" id="refdoc-body">
         <div style="margin-bottom:10px;font-family:var(--mono);font-size:10px;color:var(--ink3);line-height:1.7;">
           Upload multiple text/PDF files to ingest into the reasoning engine.
@@ -181,11 +185,11 @@
           <strong>Note:</strong> For PDFs, save as plain text first, or paste content directly in the custom topic box.
         </div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <label style="padding:7px 14px;background:var(--ink);color:#fff;cursor:pointer;font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;">
-            Choose Files
-            <input type="file" id="ref-doc-input" accept=".txt,.md,.pdf,.doc,.docx" multiple style="display:none;" onchange="handleRefDocUpload(this)">
-          </label>
-          <span id="ref-doc-name" style="font-family:var(--mono);font-size:10px;color:var(--ink3);">No files loaded</span>
+          <!-- The input is visually hidden but still in the tab order; display:none
+               would have taken it out entirely, leaving upload mouse-only. -->
+          <label class="file-label" for="ref-doc-input">Choose Files</label>
+          <input class="visually-hidden" type="file" id="ref-doc-input" accept=".txt,.md,.pdf,.doc,.docx" multiple onchange="handleRefDocUpload(this)">
+          <span id="ref-doc-name" role="status" aria-live="polite" style="font-family:var(--mono);font-size:10px;color:var(--ink3);">No files loaded</span>
           <button id="ref-doc-clear" onclick="clearRefDoc()" style="display:none;padding:6px 10px;background:var(--paper2);border:1px solid var(--rule-heavy);cursor:pointer;font-family:var(--cond);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red);">Remove All</button>
         </div>
         <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--ink4);">Max ~1 MB total plain text · Files never leave your device</div>
@@ -588,88 +592,103 @@
 
 <!-- ========== SETTINGS MODAL ========== -->
 <div id="settings-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,10,8,.7);align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:var(--paper);border:2px solid var(--rule-heavy);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:0;">
-    <div style="background:var(--ink);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-family:var(--cond);font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;">⚙ API &amp; Model Settings</span>
-      <button onclick="closeSettings()" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1;">×</button>
+  <div role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" style="background:var(--paper);border:2px solid var(--rule-heavy);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:0;">
+    <div style="background:var(--ink);color:var(--on-ink);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+      <span id="settings-modal-title" style="font-family:var(--cond);font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;"><span aria-hidden="true">⚙</span> API &amp; Model Settings</span>
+      <button onclick="closeSettings()" aria-label="Close settings" style="background:none;border:none;color:var(--on-ink);font-size:18px;cursor:pointer;line-height:1;"><span aria-hidden="true">×</span></button>
     </div>
     <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
 
       <div style="background:var(--paper2);padding:14px;border:1px solid var(--rule);margin-bottom:12px;">
-        <label style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Primary Model (Layers 0,2,3,5)</label>
+        <div role="heading" aria-level="3" style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Primary Model (Layers 0,2,3,5)</div>
         
         <div style="margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Provider</label>
+          <label for="set-primary-provider" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Provider</label>
           <select id="set-primary-provider" onchange="updateSettingsHints()" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
             <option value="anthropic">Anthropic (Claude)</option>
             <option value="local">Local (Ollama/LM Studio)</option>
             <option value="openrouter">OpenRouter</option>
             <option value="groq">Groq</option>
-            <option value="free">Free tier (OpenRouter)</option>
+            <option value="free">Free tier (OpenRouter :free models)</option>
           </select>
         </div>
 
         <div id="set-primary-local-wrap" style="display:none;margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Local / Self-Hosted Endpoint URL</label>
+          <label for="set-primary-local-url" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Local / Self-Hosted Endpoint URL</label>
           <input id="set-primary-local-url" type="text" placeholder="http://localhost:11434" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
           <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:3px;">Ollama default: http://localhost:11434 &nbsp;·&nbsp; LM Studio default: http://localhost:1234</div>
         </div>
 
         <div id="set-primary-key-wrap" style="margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">API Key</label>
+          <label for="set-primary-key" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">API Key</label>
           <input id="set-primary-key" type="password" placeholder="sk-..." style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:3px;">Free-tier models still need a key (openrouter.ai/keys) — a free account is enough, :free models aren't billed.</div>
         </div>
 
         <div style="margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Model Name</label>
-          <input id="set-primary-model" type="text" placeholder="Leave blank for default" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
+          <label for="set-primary-model" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Model Name</label>
+          <input id="set-primary-model" type="text" list="free-model-suggestions" placeholder="Leave blank for default" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
         </div>
       </div>
 
       <div style="background:var(--paper2);padding:14px;border:1px solid var(--rule);margin-bottom:12px;">
-        <label style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Secondary Model (Layers 1,4 — independent perspective)</label>
+        <div role="heading" aria-level="3" style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Secondary Model (Layers 1,4 — independent perspective)</div>
         
         <div style="margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Provider</label>
+          <label for="set-secondary-provider" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Provider</label>
           <select id="set-secondary-provider" onchange="updateSettingsHints()" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
             <option value="anthropic">Anthropic (Claude)</option>
             <option value="local">Local (Ollama/LM Studio)</option>
             <option value="openrouter">OpenRouter</option>
             <option value="groq">Groq</option>
-            <option value="free">Free tier (OpenRouter)</option>
+            <option value="free">Free tier (OpenRouter :free models)</option>
           </select>
         </div>
 
         <div id="set-secondary-local-wrap" style="display:none;margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Local / Self-Hosted Endpoint URL</label>
+          <label for="set-secondary-local-url" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Local / Self-Hosted Endpoint URL</label>
           <input id="set-secondary-local-url" type="text" placeholder="http://localhost:11434" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
           <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:3px;">Ollama default: http://localhost:11434 &nbsp;·&nbsp; LM Studio default: http://localhost:1234</div>
         </div>
 
         <div id="set-secondary-key-wrap" style="margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">API Key</label>
+          <label for="set-secondary-key" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">API Key</label>
           <input id="set-secondary-key" type="password" placeholder="sk-..." style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:3px;">Free-tier models still need a key (openrouter.ai/keys) — a free account is enough, :free models aren't billed.</div>
         </div>
 
         <div style="margin-top:10px;">
-          <label style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Model Name</label>
-          <input id="set-secondary-model" type="text" placeholder="Leave blank for default" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
+          <label for="set-secondary-model" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Model Name</label>
+          <input id="set-secondary-model" type="text" list="free-model-suggestions" placeholder="Leave blank for default" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
           <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:3px;">Layer 1 (Context) &amp; Layer 4 (Critique) use the secondary model to provide a truly independent analytical perspective.</div>
         </div>
       </div>
+
+      <datalist id="free-model-suggestions">
+        <option value="nvidia/nemotron-3-ultra-550b-a55b:free">
+        <option value="nvidia/nemotron-3-super-120b-a12b:free">
+        <option value="z-ai/glm-5.2:free">
+        <option value="minimax/minimax-m3:free">
+        <option value="minimax/minimax-m2.7:free">
+        <option value="google/gemma-4-31b-it:free">
+        <option value="google/gemma-4-26b-a4b-it:free">
+        <option value="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free">
+        <option value="cohere/north-mini-code:free">
+        <option value="liquid/lfm-2.5-2.6b:free">
+      </datalist>
 
       <div style="background:var(--paper2);border:1px solid var(--rule);padding:10px;font-family:var(--mono);font-size:9px;color:var(--ink3);line-height:1.7;">
         <strong>Provider notes:</strong><br>
         • <strong>Local</strong>: Ollama or LM Studio on this machine — no key, no cloud, fully private.<br>
         • <strong>Anthropic</strong>: Key stays server-side in .env — leave API key blank to use server key.<br>
         • <strong>OpenRouter / Groq</strong>: Add your API keys above to access their models.<br>
-        • <strong>Free</strong>: Uses OpenRouter's free-tier models (Llama 3.3, Qwen3). Slower but no cost.<br>
+        • <strong>Free</strong>: OpenRouter's <code>:free</code> models (Nemotron, GLM, MiniMax, Gemma…) — still needs a free OpenRouter key, but no billing. Rate-limited (~20 req/min, 50/day per model).<br>
         <span style="display:inline-block;margin-top:6px;color:var(--ink4);">Keys are stored safely in your browser (localStorage).</span>
       </div>
 
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button onclick="closeSettings()" style="padding:8px 16px;background:var(--paper2);border:1px solid var(--rule-heavy);cursor:pointer;font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Cancel</button>
-        <button onclick="saveSettings()" style="padding:8px 20px;background:var(--ink);color:#fff;border:none;cursor:pointer;font-family:var(--cond);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;">Save Settings</button>
+        <button onclick="saveSettings()" style="padding:8px 20px;background:var(--ink);color:var(--on-ink);border:none;cursor:pointer;font-family:var(--cond);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;">Save Settings</button>
       </div>
     </div>
   </div>
@@ -678,7 +697,9 @@
 <!-- ========== REFERENCE DOCUMENT PANEL (added to reason tab area) ========== -->
 <div id="ref-doc-panel" style="display:none;"><!-- rendered by JS into page --></div>
 
-<footer style="max-width:1200px;margin:2rem auto 1rem;padding:0 1rem;text-align:center;font-size:11px;line-height:1.6;color:#8a8a80;border-top:1px solid #d8d5cc;padding-top:.75rem;">
+<!-- The "not a fatwa" disclaimer. PRODUCT.md makes it binding, so it is set
+     in readable ink (13.2:1), not the 3.28:1 grey it used to be styled down to. -->
+<footer style="max-width:1200px;margin:2rem auto 1rem;padding:0 1rem;text-align:center;font-size:12px;line-height:1.7;color:var(--ink2);border-top:1px solid var(--rule-heavy);padding-top:.75rem;">
   AI-Minaret is an AI reasoning exercise for study and reflection. It is <strong>not</strong> a mufti and its output is <strong>not</strong> a fatwa or religious ruling.
   AI models can misquote or misattribute sources — verify every Quran and Hadith citation with qualified scholars before relying on it.
 </footer>

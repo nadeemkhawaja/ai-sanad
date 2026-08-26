@@ -1,6 +1,12 @@
 // ================================================================
 // CATEGORY + TOPIC DATABASE — 9 categories × 4 topics = 36 total
 
+// Canvas paints raw pixels and cannot read CSS custom properties, so these
+// three mirror --paper / --ink / --red. The rest of the app reads the tokens.
+const PAPER_HEX = '#faf8f3';
+const INK_HEX   = '#0a0a08';
+const RED_HEX   = '#c41230';
+
 function esc(str) {
   if (!str) return '';
   return String(str)
@@ -15,7 +21,7 @@ function esc(str) {
 // ================================================================
 const CATS = [
   {
-    id:'quran', label:'Quran', label_ur:'قرآن', label_ar:'القرآن', accent:'#1D9E75',
+    id:'quran', label:'Quran', label_ur:'قرآن', label_ar:'القرآن', accent:'#136b4f',
     subs:[
       { id:'quranic_sciences', label:'Quranic Sciences', label_ur:'قرآنی علوم', label_ar:'علوم القرآن', sources:['Tafsir Ibn Kathir', 'Tafsir al-Jalalayn', 'Al-Qurtubi', 'Al-Tabari', 'Tafsir Al-Sa\'di', 'Baghawi', 'Maariful Quran', 'Tafhim-ul-Quran', 'Al-Kashshaf', 'Fi Zilal al-Quran'],
         topics:[
@@ -40,7 +46,7 @@ const CATS = [
     ]
   },
   {
-    id:'hadith', label:'Hadith', label_ur:'حدیث', label_ar:'الحديث', accent:'#0284c7',
+    id:'hadith', label:'Hadith', label_ur:'حدیث', label_ar:'الحديث', accent:'#075985',
     subs:[
       { id:'hadith_methodology', label:'Hadith Methodology (Mustalah)', label_ur:'اصول حدیث (مصطلح)', label_ar:'مصطلح الحديث', sources:['Muqaddimah Ibn al-Salah', 'Nukhbat al-Fikar', 'Al-Risalah', 'Al-Kifayah fi Ilm al-Riwayah', 'Tadrib al-Rawi', 'Fath al-Mughith', 'Qawaid al-Tahdith', 'Manhaj al-Naqd', 'Sunnah.com', 'Dorar.net'],
         topics:[
@@ -64,7 +70,7 @@ const CATS = [
     ]
   },
   {
-    id:'islamqa', label:'Islam QA', label_ur:'اسلام سوال و جواب', label_ar:'فتاوى إسلامية', accent:'#c2410c',
+    id:'islamqa', label:'Islam QA', label_ur:'اسلام سوال و جواب', label_ar:'فتاوى إسلامية', accent:'#9a3009',
     subs:[
       { id:'fatwa_councils', label:'Fatwa Councils & Q&A', label_ur:'فتاویٰ کونسلز اور سوال و جواب', label_ar:'لجان الفتوى والأسئلة والأجوبة', sources:['IslamQA.info', 'SeekersGuidance', 'Dar al-Ifta al-Misriyyah', 'AMJA Online', 'IslamWeb', 'Yaqeen Institute', 'AlMaghrib Institute', 'Assembly of Muslim Jurists', 'European Council for Fatwa', 'E-Fatwa (Malaysia)'],
         topics:[
@@ -74,7 +80,7 @@ const CATS = [
     ]
   },
   {
-    id:'top_questions', label:'Top 10 Questions', label_ur:'اہم 10 سوالات', label_ar:'أهم 10 أسئلة', accent:'#9333ea',
+    id:'top_questions', label:'Top 10 Questions', label_ur:'اہم 10 سوالات', label_ar:'أهم 10 أسئلة', accent:'#6b21a8',
     subs:[
       { id:'modern_challenges', label:'Modern Challenges & Theology', label_ur:'جدید چیلنجز اور عقیدہ', label_ar:'التحديات المعاصرة والعقيدة', sources:['Yaqeen Institute', 'Al-Ghazali', 'Contemporary Scholars'],
         topics:[
@@ -611,7 +617,7 @@ function renderSub(catId, subId) {
   // Update sources
   const ssq = document.getElementById('sel-source-quick');
   ssq.innerHTML = sub.sources.map(s =>
-    `<option value="${s}">${s.split(' (')[0]}</option>`).join('');
+    `<option value="${esc(s)}">${esc(s.split(' (')[0])}</option>`).join('');
   S.source = sub.sources[0];
   const fn = document.getElementById('source-footnote');
   const sourceStr = currentLang === 'ur' ? 'کے ماخذ' : currentLang === 'ar' ? 'مصادر' : 'Sources for';
@@ -624,12 +630,12 @@ function renderSub(catId, subId) {
     const title = currentLang === 'ur' ? (t.title_ur || t.title) : currentLang === 'ar' ? (t.title_ar || t.title) : t.title;
     const tSub = currentLang === 'ur' ? (t.sub_ur || t.sub) : currentLang === 'ar' ? (t.sub_ar || t.sub) : t.sub;
     return `
-      <div class="topic-card" id="tc-${catId}-${subId}-${i}" onclick="selectTopic('${catId}','${subId}',${i})">
-        <div class="tc-label" style="color:${cat.accent};">${subLabel.toUpperCase()}</div>
-        <div class="tc-head">${title}</div>
-        <div class="tc-sub">${tSub}</div>
-        <div class="tc-check">✓</div>
-      </div>`;
+      <button type="button" class="topic-card" id="tc-${catId}-${subId}-${i}" aria-pressed="false" onclick="selectTopic('${catId}','${subId}',${i})">
+        <span class="tc-label" style="color:${cat.accent};">${esc(subLabel).toUpperCase()}</span>
+        <span class="tc-head">${esc(title)}</span>
+        <span class="tc-sub">${esc(tSub)}</span>
+        <span class="tc-check" aria-hidden="true">✓</span>
+      </button>`;
   }).join('');
 }
 
@@ -639,12 +645,15 @@ function selectTopic(catId, subId, i) {
   const t = sub.topics[i];
   S.topic = t.title;
   S.positions = t.positions;
-  document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.topic-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-pressed', 'false');
+  });
   const card = document.getElementById(`tc-${catId}-${subId}-${i}`);
-  if (card) card.classList.add('selected');
+  if (card) { card.classList.add('selected'); card.setAttribute('aria-pressed', 'true'); }
   const ps = document.getElementById('sel-pos');
   ps.innerHTML = '<option value="">— Select side —</option>' +
-    t.positions.map(p=>`<option value="${p}">${p}</option>`).join('');
+    t.positions.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
   syncAIA(); updatePreview();
 }
 
@@ -653,10 +662,13 @@ function setCustom() {
   if (!v) return;
   S.topic = v;
   S.positions = [`Support: "${v}"`, `Oppose: "${v}"`];
-  document.querySelectorAll('.topic-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.topic-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-pressed', 'false');
+  });
   const ps = document.getElementById('sel-pos');
   ps.innerHTML = '<option value="">— Select side —</option>' +
-    S.positions.map(p=>`<option value="${p}">${p}</option>`).join('');
+    S.positions.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
   syncAIA(); updatePreview();
   telegram('Motion filed ✓', 'ok');
 }
@@ -707,7 +719,9 @@ function toggleAcc(k) {
   const arrow = document.getElementById(k+'-arrow');
   const head = body.previousElementSibling;
   body.classList.toggle('open'); arrow.classList.toggle('open');
-  head.classList.toggle('open', body.classList.contains('open'));
+  const open = body.classList.contains('open');
+  head.classList.toggle('open', open);
+  head.setAttribute('aria-expanded', String(open));
 }
 
 // ================================================================
@@ -716,8 +730,12 @@ function toggleAcc(k) {
 function initTones() {
   document.querySelectorAll('.tone-pill').forEach(b => {
     b.onclick = () => {
-      document.querySelectorAll('.tone-pill').forEach(x=>x.classList.remove('sel'));
+      document.querySelectorAll('.tone-pill').forEach(x=>{
+        x.classList.remove('sel');
+        x.setAttribute('aria-pressed','false');
+      });
       b.classList.add('sel');
+      b.setAttribute('aria-pressed','true');
       S.tone = b.dataset.tone;
     };
   });
@@ -865,10 +883,22 @@ async function runPipeline() {
 
     const currentCatObj = CATS.find(c => c.id === S.currentCat);
     const currentSubObj = currentCatObj ? currentCatObj.subs.find(s => s.id === S.currentSub) : null;
-    const allAvailableSources = currentSubObj ? [...currentSubObj.sources] : [S.source];
-    if (S.uploadFileNames && S.uploadFileNames.length > 0) allAvailableSources.push(...S.uploadFileNames);
-    
+    const catSources = currentSubObj ? [...currentSubObj.sources] : [S.source];
+    const uploadedSources = (S.uploadFileNames && S.uploadFileNames.length > 0) ? [...S.uploadFileNames] : [];
+    const allAvailableSources = [...catSources, ...uploadedSources];
+
+    // Uploaded files are always named and always take priority; category
+    // sources are only shuffled in to fill out the remaining slots.
     function getLayerSources() {
+      if (uploadedSources.length > 0) {
+        const pool = [...catSources];
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        const fillCount = Math.max(0, 2 - uploadedSources.length);
+        return [...uploadedSources, ...pool.slice(0, fillCount)].join(' & ');
+      }
       if (allAvailableSources.length === 0) return S.source;
       const pool = [...allAvailableSources];
       for (let i = pool.length - 1; i > 0; i--) {
@@ -881,7 +911,7 @@ async function runPipeline() {
     // L1 CONTEXT — uses secondary model for independent perspective
     setTW('Layer 1 — Mapping the debate landscape...');
     const src1 = getLayerSources();
-    await runLayer(1,'Context Analysis','AI Scholar objectively maps the debate','#2c2c28',
+    await runLayer(1,'Context Analysis','AI Scholar objectively maps the debate','var(--ink2)',
       `You are writing as a ${S.persona}. Tone: ${S.tone}. Keep the output brief, simple, crisp, and clear for a normal reader. Your length must strictly match the argument depth. Draw on the expertise of ${src1}.
 ${S.lang}Layer 1 — Context Analysis.
 Topic: "${S.topic}". Position: "${S.position}".${refCtx}
@@ -891,7 +921,7 @@ Do NOT take a position. ${S.depth} words. ${CITE}`, true, src1);
     // L2 ARGUMENTS — primary model
     setTW('Layer 2 — Building your strongest arguments...');
     const src2 = getLayerSources();
-    await runLayer(2,'Argument Builder','Three evidence-backed arguments in your defence','#c41230',
+    await runLayer(2,'Argument Builder','Three evidence-backed arguments in your defence','var(--red)',
       `You are writing as a ${S.persona}. Tone: ${S.tone}. Keep the output brief, simple, crisp, and clear for a normal reader. Your length must strictly match the argument depth. Draw on the expertise of ${src2}.
 ${S.lang}Layer 2 — Argument Builder.
 Topic: "${S.topic}". Defend: "${S.position}".
@@ -909,7 +939,7 @@ ${S.depth} words. ${CITE}`, false, src2);
     // L3 COUNTER — primary model
     setTW('Layer 3 — Generating the strongest opposition...');
     const src3 = getLayerSources();
-    await runLayer(3,'Counter-Argument','The strongest case against your position','#5a5a52',
+    await runLayer(3,'Counter-Argument','The strongest case against your position','var(--ink3)',
       `You are writing as a ${S.persona}. Tone: ${S.tone}. Keep the output brief, simple, crisp, and clear for a normal reader. Your length must strictly match the argument depth. Draw on the expertise of ${src3}.
 ${S.lang}Layer 3 — Counter-Argument.
 Topic: "${S.topic}". Challenge: "${S.position}".
@@ -921,7 +951,7 @@ ${S.socraticAnswers.length?`User reinforced position: ${S.socraticAnswers.join('
     // L4 CRITIQUE — uses secondary model for independent critical perspective
     setTW('Layer 4 — Auditing weaknesses in your case...');
     const src4 = getLayerSources();
-    await runLayer(4,'Self-Critique','Honest flaws in the Layer 2 arguments','#b8860b',
+    await runLayer(4,'Self-Critique','Honest flaws in the Layer 2 arguments','var(--gold)',
       `You are writing as a ${S.persona}. Tone: ${S.tone}. Keep the output brief, simple, crisp, and clear for a normal reader. Your length must strictly match the argument depth. Draw on the expertise of ${src4}.
 ${S.lang}Layer 4 — Self-Critique.
 Topic: "${S.topic}". Position: "${S.position}".
@@ -932,7 +962,7 @@ Counter-arguments faced (L3): ${S.layers[3]||''}
     // L5 FINAL
     setTW('Layer 5 — AI Scholar delivers the final verdict...');
     const src5 = "ALL Uploaded Files, Quran, Sahih Muslim, and Category Sources";
-    await runLayer(5,'Final Strategy & Verdict',"AI Scholar's definitive ruling",'#0a0a08',
+    await runLayer(5,'Final Strategy & Verdict',"AI Scholar's definitive ruling",'var(--ink)',
       `You are AI Scholar, an elite AI Reasoning Strategist and host.
 Tone: ${S.tone}. Keep the output brief, simple, crisp, and clear for a normal reader. Your length must strictly match the argument depth.
 CRITICAL RULE: Draw on ALL category sources and all uploaded .md files. Give heavy weight to Sahih Muslim for Hadith evidence. You MUST always look to the Quran as the final authoritative verdict, and ensure no cited Hadith contradicts the Quran.
@@ -1048,7 +1078,7 @@ function makeArticle(n, title, sub, color, loading, roleStr, providerStr, layerS
       <div class="article-meta">
         <div class="article-section" style="color:${color};">${title}</div>
         <div class="article-headline">${sub}</div>
-        <div class="article-deck">AI Scholar · Drawing on ${sourceLabel} · ${targetModelInfo}</div>
+        <div class="article-deck">AI Scholar · Drawing on ${esc(sourceLabel)} · ${esc(targetModelInfo)}</div>
       </div>
       <div class="article-status running">COMPOSING</div>
     </div>
@@ -1076,7 +1106,10 @@ function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, us
   const strong = lines.find(l => l.length > 60 && !l.startsWith('**') && !l.startsWith('#'));
   if (strong) pullQuote = strong.substring(0,120)+(strong.length>120?'...':'');
 
-  const formatted = text
+  // Escape BEFORE applying markdown, never after. Model output and uploaded
+  // filenames both land here, and the whole point of this product is feeding
+  // user documents into the prompt — so this string is not trusted.
+  const formatted = esc(text)
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
     .replace(/\n\n/g,'</p><p>')
     .replace(/\n/g,' ');
@@ -1104,14 +1137,14 @@ function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, us
         <div class="article-section" style="color:${color};">Layer ${n} — ${title}</div>
         <div style="font-family:var(--cond);font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;">${ps.label} &nbsp;·&nbsp; SCIPAB Framework</div>
         <div class="article-headline">${sub}</div>
-        <div class="article-deck">By AI Scholar · ${sourceLabel} · ${elapsed}s · ${targetModelInfo} · eff: <span style="${effColor}">${efficiency}</span></div>
+        <div class="article-deck">By AI Scholar · ${esc(sourceLabel)} · ${elapsed}s · ${esc(targetModelInfo)} · eff: <span style="${effColor}">${efficiency}</span></div>
       </div>
       <div class="article-status done2">PRINTED</div>
     </div>
     <hr class="article-rule">
     <div class="article-body">
       <div class="article-text">
-        ${pullQuote ? `<div class="pull-quote">"${pullQuote}"</div>` : ''}
+        ${pullQuote ? `<div class="pull-quote">"${esc(pullQuote)}"</div>` : ''}
         <p>${formatted}</p>
       </div>
     </div>
@@ -1200,7 +1233,7 @@ function runTelemetryOptimization() {
     </div>
     <div style="padding:14px;">
       ${insights.map(ins=>`
-        <div style="padding:10px 12px;margin-bottom:8px;border-left:3px solid ${ins.type==='ok'?'#4ade80':ins.type==='warn'?'var(--gold)':'var(--b2)'};background:var(--paper2);">
+        <div style="padding:10px 12px;margin-bottom:8px;border-left:3px solid ${ins.type==='ok'?'var(--ok)':ins.type==='warn'?'var(--gold)':'var(--rule-heavy)'};background:var(--paper2);">
           <div style="font-family:var(--cond);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">
             ${ins.icon} ${ins.title} <span style="font-weight:400;color:var(--ink3);margin-left:8px;">· ${ins.layer}</span>
           </div>
@@ -1566,25 +1599,25 @@ function initAvatar() {
     f++;
     ctx.clearRect(0,0,100,100);
     // Paper background
-    ctx.fillStyle='#faf8f3';ctx.fillRect(0,0,100,100);
+    ctx.fillStyle=PAPER_HEX;ctx.fillRect(0,0,100,100);
     // Face (editorial illustration style — stark B&W)
-    ctx.fillStyle='#0a0a08';
+    ctx.fillStyle=INK_HEX;
     ctx.beginPath();ctx.arc(50,50,38,0,Math.PI*2);ctx.fill();
     // White inner face
-    ctx.fillStyle='#faf8f3';
+    ctx.fillStyle=PAPER_HEX;
     ctx.beginPath();ctx.arc(50,50,34,0,Math.PI*2);ctx.fill();
     // Eyes
     const blink=f%150<5?Math.sin(f%5*Math.PI/5):0;
     [35,65].forEach(x=>{
-      ctx.fillStyle='#0a0a08';
+      ctx.fillStyle=INK_HEX;
       ctx.beginPath();ctx.ellipse(x,45,4,Math.max(1,5*(1-blink)),0,0,Math.PI*2);ctx.fill();
     });
     // Mouth
     const mh=S.isSpeaking?Math.abs(Math.sin(f*.2))*6+2:2;
-    ctx.fillStyle='#0a0a08';
+    ctx.fillStyle=INK_HEX;
     ctx.beginPath();ctx.ellipse(50,62,9,mh,0,0,Math.PI);ctx.fill();
     // "LUFIALLOLA" text stamp
-    ctx.fillStyle='#c41230';
+    ctx.fillStyle=RED_HEX;
     ctx.font='bold 7px "Barlow Condensed",sans-serif';
     ctx.textAlign='center';
     ctx.fillText('LUFIALLOLA',50,93);
@@ -1646,13 +1679,13 @@ function renderHistory() {
     return;
   }
   list.innerHTML=S.history.map((e,i)=>`
-    <div class="archive-entry" onclick="reloadEntry(${i})">
-      <div>
-        <div class="ae-topic">${e.topic}</div>
-        <div class="ae-meta">${e.position.substring(0,50)} · ${e.ts}</div>
-      </div>
-      <div class="ae-score">${e.score}</div>
-    </div>`).join('');
+    <button type="button" class="archive-entry" onclick="reloadEntry(${i})">
+      <span>
+        <span class="ae-topic">${esc(e.topic)}</span>
+        <span class="ae-meta">${esc(e.position.substring(0,50))} · ${esc(e.ts)}</span>
+      </span>
+      <span class="ae-score">${esc(String(e.score))}</span>
+    </button>`).join('');
 }
 function clearHist(){ S.history=[]; renderHistory(); }
 
@@ -1661,7 +1694,7 @@ function reloadEntry(i) {
   S.topic=e.topic; S.position=e.position; S.layers=e.layers;
   switchTab('debate');
   document.getElementById('pipeline').innerHTML='';
-  const colors=['#2c2c28','#c41230','#5a5a52','#b8860b','#0a0a08'];
+  const colors=['var(--ink2)','var(--red)','var(--ink3)','var(--gold)','var(--ink)'];
   const titles=['Context Analysis','Argument Builder','Counter-Argument','Self-Critique','Final Strategy & Verdict'];
   const subs=['Debate landscape mapped','Three arguments built','Opposition generated','Weaknesses identified','AI Scholar\'s verdict'];
   for(let n=1;n<=5;n++){
@@ -1763,16 +1796,31 @@ const DEFAULT_MODELS = {
     local: 'google/gemma-4-26B-A4B-it',
     groq: 'llama-3.3-70b-versatile',
     openrouter: 'anthropic/claude-opus-4.8',
-    free: 'meta-llama/llama-3.3-70b-instruct:free',
+    free: 'nvidia/nemotron-3-ultra-550b-a55b:free',
   },
   secondary: {
     anthropic: 'claude-haiku-4-5',
     local: 'google/gemma-4-26B-A4B-it',
     groq: 'llama-3.1-8b-instant',
     openrouter: 'anthropic/claude-haiku-4.5',
-    free: 'qwen/qwen3-next-80b-a3b-instruct:free',
+    free: 'z-ai/glm-5.2:free',
   },
 };
+
+// Free OpenRouter models worth surfacing as suggestions (id, size/notes).
+// Source: live GET https://openrouter.ai/api/v1/models filtered to *:free
+const FREE_MODEL_SUGGESTIONS = [
+  'nvidia/nemotron-3-ultra-550b-a55b:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+  'z-ai/glm-5.2:free',
+  'minimax/minimax-m3:free',
+  'minimax/minimax-m2.7:free',
+  'google/gemma-4-31b-it:free',
+  'google/gemma-4-26b-a4b-it:free',
+  'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+  'cohere/north-mini-code:free',
+  'liquid/lfm-2.5-2.6b:free',
+];
 
 function getApiSettings() {
   try { return JSON.parse(localStorage.getItem('am_settings') || '{}'); } catch { return {}; }
@@ -1849,9 +1897,11 @@ async function _apiFetch(prompt, maxTokens, useSecondary) {
   }
 
   if (provider === 'openrouter' || provider === 'free') {
-    // Call OpenRouter directly from browser (they support CORS)
+    // Call OpenRouter directly from browser (they support CORS).
+    // Note: OpenRouter requires a key on every request, even for ":free" models —
+    // the key just isn't billed for those. Get a free one at openrouter.ai/keys.
     const key = useSecondary ? (s.secondaryKey || '') : (s.primaryKey || '');
-    if (!key && provider === 'openrouter') throw new Error('OpenRouter API key not set — open Settings ⚙');
+    if (!key) throw new Error('OpenRouter API key not set — open Settings ⚙ (a free account works for :free models)');
     return fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -1928,14 +1978,14 @@ function updateSettingsHints() {
     local: { p:'llama3.2', s:'llama3.2' },
     openrouter: { p:'anthropic/claude-opus-4.8', s:'anthropic/claude-haiku-4.5' },
     groq: { p:'llama-3.3-70b-versatile', s:'llama-3.1-8b-instant' },
-    free: { p:'meta-llama/llama-3.3-70b-instruct:free', s:'qwen/qwen3-next-80b-a3b-instruct:free' },
+    free: { p:'nvidia/nemotron-3-ultra-550b-a55b:free', s:'z-ai/glm-5.2:free' },
   };
   
   document.getElementById('set-primary-local-wrap').style.display = (pp === 'local') ? 'block' : 'none';
-  document.getElementById('set-primary-key-wrap').style.display = (pp === 'local' || pp === 'free') ? 'none' : 'block';
-  
+  document.getElementById('set-primary-key-wrap').style.display = (pp === 'local') ? 'none' : 'block';
+
   document.getElementById('set-secondary-local-wrap').style.display = (sp === 'local') ? 'block' : 'none';
-  document.getElementById('set-secondary-key-wrap').style.display = (sp === 'local' || sp === 'free') ? 'none' : 'block';
+  document.getElementById('set-secondary-key-wrap').style.display = (sp === 'local') ? 'none' : 'block';
 
   if (!document.getElementById('set-primary-model').value) document.getElementById('set-primary-model').placeholder = hints[pp]?.p || '';
   if (!document.getElementById('set-secondary-model').value) document.getElementById('set-secondary-model').placeholder = hints[sp]?.s || '';
@@ -1947,7 +1997,7 @@ function updateSettingsBadge() {
     const p = s.primaryProvider || 'local';
     const labels = { anthropic:'Claude', local:'Local', openrouter:'OpenRouter', groq:'Groq', free:'Free' };
     el.textContent = labels[p] || 'Local';
-    el.style.background = p === 'anthropic' ? '#c41230' : p === 'local' ? '#0e7490' : (p === 'openrouter' || p === 'groq') ? '#5b3dbd' : '#2e7d32';
+    el.style.background = p === 'anthropic' ? 'var(--red)' : p === 'local' ? 'var(--info)' : (p === 'openrouter' || p === 'groq') ? 'var(--gold)' : 'var(--ok)';
   }
   const mastheadModels = document.getElementById('masthead-models');
   if (mastheadModels) {
