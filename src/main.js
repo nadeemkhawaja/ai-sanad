@@ -718,7 +718,13 @@ async function runPipeline() {
           [pool[i], pool[j]] = [pool[j], pool[i]];
         }
         const fillCount = Math.max(0, 2 - uploadedSources.length);
-        return [...uploadedSources, ...pool.slice(0, fillCount)].join(' & ');
+        // One file gets named; more than one collapses to a count — the
+        // alternative was spreading all 18+ timestamped filenames into a
+        // single unreadable line on every article.
+        const uploadLabel = uploadedSources.length === 1
+          ? cleanFileName(uploadedSources[0])
+          : `${uploadedSources.length} uploaded files`;
+        return [uploadLabel, ...pool.slice(0, fillCount)].join(' & ');
       }
       if (allAvailableSources.length === 0) return S.source;
       const pool = [...allAvailableSources];
@@ -851,6 +857,24 @@ If no fallacies: {"fallacies":[]}`, 400);
 // ================================================================
 // LAYER RUNNER
 // ================================================================
+// Uploaded filenames on disk carry a "<timestamp>-<random>-" prefix from
+// multer (see server/app.js) — strip that before ever showing a name to a
+// reader.
+function cleanFileName(name) {
+  return name.replace(/^\d{10,}-\d+-/, '');
+}
+
+// The "Drawing on ..." line: one uploaded file gets named, more than one
+// collapses to a count — the alternative was every article listing every
+// timestamped filename in a single unreadable line.
+function sourceLabelFor(layerSourceOverride) {
+  let label = layerSourceOverride || S.source.split(' (')[0];
+  const files = (!layerSourceOverride && S.uploadFileNames) || [];
+  if (files.length === 1) label += ` & ${cleanFileName(files[0])}`;
+  else if (files.length > 1) label += ` & ${files.length} uploaded files`;
+  return label;
+}
+
 // Provider/model label for a role, for display purposes only. Tertiary has
 // no user-facing provider or fixed model — it's always the free-tier
 // rotation, and which model actually answered isn't known until the
@@ -897,10 +921,7 @@ function makeArticle(n, title, sub, color, loading, roleStr, providerStr, layerS
   const targetModel = fallback.model || 'rotating…';
   const targetModelInfo = `${actualRoleStr} Model (${actualProviderStr.toUpperCase()}) · ${targetModel}`;
 
-  let sourceLabel = layerSourceOverride || S.source.split(' (')[0];
-  if (!layerSourceOverride && S.uploadFileNames && S.uploadFileNames.length > 0) {
-    sourceLabel += ` & ${S.uploadFileNames.join(', ')}`;
-  }
+  let sourceLabel = sourceLabelFor(layerSourceOverride);
   
   div.className = 'article loading';
   div.style.setProperty('--lc', color);
@@ -954,10 +975,7 @@ function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, us
   const roleStr = ROLE_LABEL[role];
   const targetModelInfo = `${roleStr} (${providerStr.toUpperCase()}) · ${usedModel || model || 'unknown'}`;
 
-  let sourceLabel = layerSourceOverride || S.source.split(' (')[0];
-  if (!layerSourceOverride && S.uploadFileNames && S.uploadFileNames.length > 0) {
-    sourceLabel += ` & ${S.uploadFileNames.join(', ')}`;
-  }
+  let sourceLabel = sourceLabelFor(layerSourceOverride);
 
   div.className = 'article done';
   div.style.setProperty('--lc', color);
