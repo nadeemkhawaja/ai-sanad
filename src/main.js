@@ -854,7 +854,7 @@ If no fallacies: {"fallacies":[]}`, 400);
 async function runLayer(n, title, sub, color, prompt, useSecondary=false, layerSourceOverride=null) {
   // Create article placeholder
   const s = getApiSettings();
-  const providerStr = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'groq' : 'local');
+  const providerStr = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
   const roleStr = useSecondary ? 'Secondary' : 'Primary';
   
   const art = makeArticle(n, title, sub, color, true, roleStr, providerStr, layerSourceOverride);
@@ -880,7 +880,7 @@ function makeArticle(n, title, sub, color, loading, roleStr, providerStr, layerS
   const div = document.createElement('div');
   const useSecondary = (n === 1 || n === 4);
   const s = getApiSettings();
-  const fallbackProvider = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'groq' : 'local');
+  const fallbackProvider = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
   const actualProviderStr = providerStr || fallbackProvider;
   const actualRoleStr = roleStr || (useSecondary ? 'Secondary' : 'Primary');
   const targetModel = useSecondary ? getSecondaryModel() : getPrimaryModel();
@@ -940,7 +940,7 @@ function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, us
   
   const useSecondary = (n === 1 || n === 4);
   const s = getApiSettings();
-  const providerStr = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'groq' : 'local');
+  const providerStr = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
   const roleStr = useSecondary ? 'Secondary' : 'Primary';
   const targetModelInfo = `${roleStr} (${providerStr.toUpperCase()}) · ${usedModel || (useSecondary ? getSecondaryModel() : getPrimaryModel())}`;
 
@@ -1613,17 +1613,11 @@ const CITE = 'Cite sources precisely: Quran as Surah name and number:ayah; Hadit
 
 const DEFAULT_MODELS = {
   primary: {
-    anthropic: 'claude-opus-4-8',
     local: 'google/gemma-4-26B-A4B-it',
-    groq: 'llama-3.3-70b-versatile',
-    openrouter: 'anthropic/claude-opus-4.8',
     free: 'nvidia/nemotron-3-ultra-550b-a55b:free',
   },
   secondary: {
-    anthropic: 'claude-haiku-4-5',
     local: 'google/gemma-4-26B-A4B-it',
-    groq: 'llama-3.1-8b-instant',
-    openrouter: 'anthropic/claude-haiku-4.5',
     free: 'z-ai/glm-5.2:free',
   },
 };
@@ -1655,7 +1649,7 @@ function getPrimaryModel() {
 
 function getSecondaryModel() {
   const s = getApiSettings();
-  const provider = s.secondaryProvider || 'groq';
+  const provider = s.secondaryProvider || 'free';
   return s.secondaryModel || DEFAULT_MODELS.secondary[provider] || DEFAULT_MODELS.secondary.free;
 }
 
@@ -1692,11 +1686,13 @@ async function apiWithTokens(prompt, maxTokens=1200, useSecondary=false) {
 
 async function _apiFetch(prompt, maxTokens, useSecondary) {
   const s = getApiSettings();
-  const provider = useSecondary ? (s.secondaryProvider || 'anthropic') : (s.primaryProvider || 'anthropic');
+  const provider = useSecondary ? (s.secondaryProvider || 'free') : (s.primaryProvider || 'local');
   const model = useSecondary ? getSecondaryModel() : getPrimaryModel();
 
   if (provider === 'local') {
-    // Ollama / LM Studio on this machine, via the server proxy (avoids CORS)
+    // Ollama / LM Studio / vLLM, via the server proxy (avoids CORS).
+    // Only reachable when running locally — on a cloud deploy this needs a
+    // publicly reachable endpoint, since the proxy rejects private/localhost.
     return fetch('/api/local', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1706,42 +1702,21 @@ async function _apiFetch(prompt, maxTokens, useSecondary) {
       })
     });
   }
-  
-  if (provider === 'groq') {
-    const key = useSecondary ? (s.secondaryKey || '') : (s.primaryKey || '');
-    if (!key) throw new Error('Groq API key not set — open Settings ⚙');
-    return fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-      body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
-    });
-  }
 
-  if (provider === 'openrouter' || provider === 'free') {
-    // Call OpenRouter directly from browser (they support CORS).
-    // Note: OpenRouter requires a key on every request, even for ":free" models —
-    // the key just isn't billed for those. Get a free one at openrouter.ai/keys.
-    const key = useSecondary ? (s.secondaryKey || '') : (s.primaryKey || '');
-    if (!key) throw new Error('OpenRouter API key not set — open Settings ⚙ (a free account works for :free models)');
-    return fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`,
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'AI-Minaret'
-      },
-      body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
-    });
-  }
-
-  // Default: Anthropic via server proxy (key in .env or user-supplied in header)
+  // 'free' — OpenRouter, called directly from the browser (they support CORS).
+  // Note: OpenRouter requires a key on every request, even for ":free" models —
+  // the key just isn't billed for those. Get a free one at openrouter.ai/keys.
+  // This key lives in the browser's Settings (localStorage) — no server-side
+  // env var needed, on Vercel or anywhere else.
   const key = useSecondary ? (s.secondaryKey || '') : (s.primaryKey || '');
-  return fetch('/api/claude', {
+  if (!key) throw new Error('OpenRouter API key not set — open Settings ⚙ (a free account works for :free models)');
+  return fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(key ? { 'x-user-api-key': key } : {})
+      'Authorization': `Bearer ${key}`,
+      'HTTP-Referer': window.location.origin,
+      'X-Title': 'AI-Minaret'
     },
     body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
   });
@@ -1752,7 +1727,7 @@ async function _apiFetch(prompt, maxTokens, useSecondary) {
 function openSettings() {
   const s = getApiSettings();
   document.getElementById('set-primary-provider').value = s.primaryProvider || 'local';
-  document.getElementById('set-secondary-provider').value = s.secondaryProvider || 'groq';
+  document.getElementById('set-secondary-provider').value = s.secondaryProvider || 'free';
   document.getElementById('set-primary-local-url').value = s.primaryLocalUrl || '';
   document.getElementById('set-secondary-local-url').value = s.secondaryLocalUrl || '';
   document.getElementById('set-primary-key').value = s.primaryKey || '';
@@ -1795,10 +1770,7 @@ function updateSettingsHints() {
   const sp = document.getElementById('set-secondary-provider').value;
   
   const hints = {
-    anthropic: { p:'claude-opus-4-8', s:'claude-haiku-4-5' },
-    local: { p:'llama3.2', s:'llama3.2' },
-    openrouter: { p:'anthropic/claude-opus-4.8', s:'anthropic/claude-haiku-4.5' },
-    groq: { p:'llama-3.3-70b-versatile', s:'llama-3.1-8b-instant' },
+    local: { p:'google/gemma-4-26B-A4B-it', s:'google/gemma-4-26B-A4B-it' },
     free: { p:'nvidia/nemotron-3-ultra-550b-a55b:free', s:'z-ai/glm-5.2:free' },
   };
   
@@ -1816,9 +1788,9 @@ function updateSettingsBadge() {
   const el = document.getElementById('settings-badge');
   if (el) {
     const p = s.primaryProvider || 'local';
-    const labels = { anthropic:'Claude', local:'Local', openrouter:'OpenRouter', groq:'Groq', free:'Free' };
+    const labels = { local:'Local', free:'Free' };
     el.textContent = labels[p] || 'Local';
-    el.style.background = p === 'anthropic' ? 'var(--red)' : p === 'local' ? 'var(--info)' : (p === 'openrouter' || p === 'groq') ? 'var(--gold)' : 'var(--ok)';
+    el.style.background = p === 'local' ? 'var(--info)' : 'var(--ok)';
   }
   const mastheadModels = document.getElementById('masthead-models');
   if (mastheadModels) {
