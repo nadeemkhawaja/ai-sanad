@@ -1,13 +1,13 @@
-# AI-Minaret — Islamic Reasoning Strategist
+# AI-Sanad — Islamic Reasoning Strategist
 
 > **Hosted by AI Scholar** — a 5-layer AI reasoning pipeline for structured Islamic discourse.
 
-AI-Minaret takes a question from classical or contemporary Islamic discourse, and reasons
+AI-Sanad takes a question from classical or contemporary Islamic discourse, and reasons
 through it in five layers: it maps the landscape, builds the strongest case, steel-mans the
 opposing view, audits its own weaknesses, and delivers a verdict — citing Quran (Surah:Ayah)
 and Hadith (collection, number, grading) along the way.
 
-> ⚠️ **Disclaimer:** AI-Minaret is a reasoning exercise for study and reflection. It is not a
+> ⚠️ **Disclaimer:** AI-Sanad is a reasoning exercise for study and reflection. It is not a
 > mufti and its output is not a fatwa. AI models can misquote sources — verify every citation
 > with qualified scholars.
 

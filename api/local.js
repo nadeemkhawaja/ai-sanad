@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   catch { return res.status(400).json({ error: 'Invalid local endpoint URL' }); }
 
   if (isPrivateHost(url.hostname)) {
-    return res.status(400).json({ error: 'This deployment runs in the cloud and cannot reach localhost/private addresses. Point "Local" at a publicly reachable endpoint, or run AI-Minaret locally for Ollama/LM Studio support.' });
+    return res.status(400).json({ error: 'This deployment runs in the cloud and cannot reach localhost/private addresses. Point "Local" at a publicly reachable endpoint, or run AI-Sanad locally for Ollama/LM Studio support.' });
   }
 
   const targetModel = model || process.env.LOCAL_LLM_MODEL || 'llama3.2';

@@ -63,8 +63,8 @@ export default async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEY || 'local'}`,
-        'HTTP-Referer': req.headers.get('origin') || 'https://ai-minaret.netlify.app',
-        'X-Title': 'AI-Minaret',
+        'HTTP-Referer': req.headers.get('origin') || 'https://ai-sanad.netlify.app',
+        'X-Title': 'AI-Sanad',
       },
       body: JSON.stringify({
         model,

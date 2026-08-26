@@ -35,7 +35,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${API_KEY || 'local'}`,
           'HTTP-Referer': process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000',
-          'X-Title': 'AI-Minaret'
+          'X-Title': 'AI-Sanad'
         },
         body: JSON.stringify({
           model,

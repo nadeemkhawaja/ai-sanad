@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# AI-Minaret — build the frontend and start the server on a fixed port.
+# AI-Sanad — build the frontend and start the server on a fixed port.
 #   ./start.sh              → http://localhost:3210
 #   PORT=4000 ./start.sh    → custom port
 set -euo pipefail
@@ -42,7 +42,7 @@ fi
 IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "127.0.0.1")
 
 echo ""
-echo "✅ AI-Minaret running  →  http://$IP:$PORT"
+echo "✅ AI-Sanad running  →  http://$IP:$PORT"
 echo "   PID $(cat "$PID_FILE") · log: $LOG_FILE · stop with ./stop.sh"
 
 # Open the browser automatically
