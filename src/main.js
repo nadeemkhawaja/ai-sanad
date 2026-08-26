@@ -757,7 +757,7 @@ ${S.depth} words. ${CITE}`, false, src2);
       await waitSocratic();
     }
 
-    // L3 COUNTER — primary model
+    // L3 COUNTER — uses secondary model for independent perspective
     setTW('Layer 3 — Generating the strongest opposition...');
     const src3 = getLayerSources();
     await runLayer(3,'Counter-Argument','The strongest case against your position','var(--ink3)',
@@ -767,9 +767,9 @@ Topic: "${S.topic}". Challenge: "${S.position}".
 Prior context (L1): ${S.layers[1]||''}
 Arguments made (L2): ${S.layers[2]||''}
 ${S.socraticAnswers.length?`User reinforced position: ${S.socraticAnswers.join(' | ')}`:''}
-3 genuinely compelling counter-arguments. No strawmen. ${S.depth} words. ${CITE}`, false, src3);
+3 genuinely compelling counter-arguments. No strawmen. ${S.depth} words. ${CITE}`, true, src3);
 
-    // L4 CRITIQUE — uses secondary model for independent critical perspective
+    // L4 CRITIQUE — primary model
     setTW('Layer 4 — Auditing weaknesses in your case...');
     const src4 = getLayerSources();
     await runLayer(4,'Self-Critique','Honest flaws in the Layer 2 arguments','var(--gold)',
@@ -778,7 +778,7 @@ ${S.lang}Layer 4 — Self-Critique.
 Topic: "${S.topic}". Position: "${S.position}".
 Original arguments (L2): ${S.layers[2]||''}
 Counter-arguments faced (L3): ${S.layers[3]||''}
-3-4 honest weaknesses with improvement suggestions. ${S.depth} words. ${CITE}`, true, src4);
+3-4 honest weaknesses with improvement suggestions. ${S.depth} words. ${CITE}`, false, src4);
 
     // L5 FINAL
     setTW('Layer 5 — AI Scholar delivers the final verdict...');
@@ -878,7 +878,7 @@ async function runLayer(n, title, sub, color, prompt, useSecondary=false, layerS
 
 function makeArticle(n, title, sub, color, loading, roleStr, providerStr, layerSourceOverride) {
   const div = document.createElement('div');
-  const useSecondary = (n === 1 || n === 4);
+  const useSecondary = (n === 1 || n === 3);
   const s = getApiSettings();
   const fallbackProvider = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
   const actualProviderStr = providerStr || fallbackProvider;
@@ -938,7 +938,7 @@ function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, us
   const efficiency = inTok > 0 ? (outTok/inTok).toFixed(2) : '—';
   const effColor = inTok > 0 && (outTok/inTok) < 0.6 ? 'color:var(--red)' : '';
   
-  const useSecondary = (n === 1 || n === 4);
+  const useSecondary = (n === 1 || n === 3);
   const s = getApiSettings();
   const providerStr = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
   const roleStr = useSecondary ? 'Secondary' : 'Primary';
@@ -1637,8 +1637,19 @@ const FREE_MODEL_SUGGESTIONS = [
   'liquid/lfm-2.5-2.6b:free',
 ];
 
+const VALID_PROVIDERS = new Set(['local', 'free']);
+
 function getApiSettings() {
-  try { return JSON.parse(localStorage.getItem('am_settings') || '{}'); } catch { return {}; }
+  let s;
+  try { s = JSON.parse(localStorage.getItem('am_settings') || '{}'); } catch { s = {}; }
+  // Migrate away from removed providers (anthropic/openrouter/groq) saved by
+  // an older version of this app — otherwise a stale choice like "groq" would
+  // silently stick around forever since it's still valid JSON.
+  let changed = false;
+  if (s.primaryProvider && !VALID_PROVIDERS.has(s.primaryProvider)) { delete s.primaryProvider; delete s.primaryModel; delete s.primaryKey; changed = true; }
+  if (s.secondaryProvider && !VALID_PROVIDERS.has(s.secondaryProvider)) { delete s.secondaryProvider; delete s.secondaryModel; delete s.secondaryKey; changed = true; }
+  if (changed) { try { localStorage.setItem('am_settings', JSON.stringify(s)); } catch {} }
+  return s;
 }
 
 function getPrimaryModel() {
@@ -1703,22 +1714,17 @@ async function _apiFetch(prompt, maxTokens, useSecondary) {
     });
   }
 
-  // 'free' — OpenRouter, called directly from the browser (they support CORS).
-  // Note: OpenRouter requires a key on every request, even for ":free" models —
-  // the key just isn't billed for those. Get a free one at openrouter.ai/keys.
-  // This key lives in the browser's Settings (localStorage) — no server-side
-  // env var needed, on Vercel or anywhere else.
-  const key = useSecondary ? (s.secondaryKey || '') : (s.primaryKey || '');
-  if (!key) throw new Error('OpenRouter API key not set — open Settings ⚙ (a free account works for :free models)');
-  return fetch('https://openrouter.ai/api/v1/chat/completions', {
+  // 'free' — server-side rotation across Groq, OpenRouter, NVIDIA, Mistral,
+  // Gemini (lib/free-providers.mjs). Keys live server-side (.env locally,
+  // Vercel env vars in prod) — the browser never holds them, so nothing to
+  // configure per-visitor. Falls through providers on missing key or error.
+  // Primary/secondary use different rotation orders so the two roles land on
+  // different models when possible — same intent as Local's separate Gemma
+  // (primary) vs free tier (secondary) split.
+  return fetch('/api/free-chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${key}`,
-      'HTTP-Referer': window.location.origin,
-      'X-Title': 'AI-Minaret'
-    },
-    body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ max_tokens: maxTokens, role: useSecondary ? 'secondary' : 'primary', messages: [{ role: 'user', content: prompt }] })
   });
 }
 // ================================================================
@@ -1771,14 +1777,17 @@ function updateSettingsHints() {
   
   const hints = {
     local: { p:'google/gemma-4-26B-A4B-it', s:'google/gemma-4-26B-A4B-it' },
-    free: { p:'nvidia/nemotron-3-ultra-550b-a55b:free', s:'z-ai/glm-5.2:free' },
   };
-  
+
   document.getElementById('set-primary-local-wrap').style.display = (pp === 'local') ? 'block' : 'none';
-  document.getElementById('set-primary-key-wrap').style.display = (pp === 'local') ? 'none' : 'block';
+  document.getElementById('set-primary-key-wrap').style.display = 'none';
+  document.getElementById('set-primary-model-wrap').style.display = (pp === 'local') ? 'block' : 'none';
+  document.getElementById('set-primary-free-note').style.display = (pp === 'free') ? 'block' : 'none';
 
   document.getElementById('set-secondary-local-wrap').style.display = (sp === 'local') ? 'block' : 'none';
-  document.getElementById('set-secondary-key-wrap').style.display = (sp === 'local') ? 'none' : 'block';
+  document.getElementById('set-secondary-key-wrap').style.display = 'none';
+  document.getElementById('set-secondary-model-wrap').style.display = (sp === 'local') ? 'block' : 'none';
+  document.getElementById('set-secondary-free-note').style.display = (sp === 'free') ? 'block' : 'none';
 
   if (!document.getElementById('set-primary-model').value) document.getElementById('set-primary-model').placeholder = hints[pp]?.p || '';
   if (!document.getElementById('set-secondary-model').value) document.getElementById('set-secondary-model').placeholder = hints[sp]?.s || '';
@@ -1794,8 +1803,10 @@ function updateSettingsBadge() {
   }
   const mastheadModels = document.getElementById('masthead-models');
   if (mastheadModels) {
-    const pm = getPrimaryModel();
-    const sm = getSecondaryModel();
+    const pp = s.primaryProvider || 'local';
+    const sp = s.secondaryProvider || 'free';
+    const pm = pp === 'free' ? 'free tier (server-rotated)' : getPrimaryModel();
+    const sm = sp === 'free' ? 'free tier (server-rotated)' : getSecondaryModel();
     if (pm === sm) {
       mastheadModels.textContent = `Connected: ${pm}`;
     } else {

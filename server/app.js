@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import dotenv from 'dotenv';
+import { rotateFreeProviders } from '../lib/free-providers.mjs';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -100,6 +101,31 @@ app.post('/api/claude', async (req, res) => {
     console.error('Proxy error:', err.message);
     return res.status(502).json({ error: 'Proxy error: ' + err.message });
   }
+});
+
+// ── Multi-provider free-tier rotation ──────────────────────
+// Server-side keys (in .env): GROQ_API_KEY, OPENROUTER_API_KEY,
+// GEMINI_API_KEY, MISTRAL_API_KEY, NVIDIA_API_KEY. See lib/free-providers.mjs.
+app.post('/api/free-chat', async (req, res) => {
+  const { messages, max_tokens, system, role } = req.body || {};
+  if (!messages) return res.status(400).json({ error: 'Missing messages' });
+
+  const fullMessages = system ? [{ role: 'system', content: system }, ...messages] : messages;
+  const result = await rotateFreeProviders(fullMessages, max_tokens || 1200, role);
+
+  if (!result.ok) {
+    console.error('All free providers failed:', JSON.stringify(result.attempts));
+    return res.status(502).json({
+      error: 'All free providers failed or have no key configured. Set at least one of GROQ_API_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY, MISTRAL_API_KEY, NVIDIA_API_KEY in .env.',
+      attempts: result.attempts,
+    });
+  }
+
+  return res.json({
+    choices: [{ message: { content: result.text } }],
+    model: `${result.provider}/${result.model}`,
+    usage: result.usage,
+  });
 });
 
 // ── Local model proxy (Ollama / LM Studio) ─────────────────
