@@ -252,22 +252,22 @@
   <!-- ========== TAB: AI vs AI ARENA ========== -->
   <div id="tab-aia" style="display:none;">
     <div class="kicker" style="margin-top:1rem;">Arena — Match Report</div>
-    <h1 class="headline" style="margin-bottom:.5rem;"><span id="arena-headline-text">AI Scholar vs The Opposition</span></h1>
+    <h2 class="headline" style="margin-bottom:.5rem;"><span id="arena-headline-text">AI Scholar vs The Opposition</span></h2>
     <p class="deck" id="arena-deck" style="margin-bottom:1.5rem;">Watch two AI reasoners go head-to-head. AI-Sanad reasons one side; you assign the opponent's persona. An impartial judge delivers the final verdict.</p>
 
     <div class="config-block">
       <div class="config-header"><span>Arena Configuration</span></div>
       <div class="config-inner">
         <div>
-          <div class="cf-label">Motion (from Reason tab or custom)</div>
+          <label class="cf-label" for="aia-topic">Motion (from Reason tab or custom)</label>
           <select id="aia-topic" style="font-size:12px;"><option value="">— Set topic in Reason tab first —</option></select>
         </div>
         <div>
-          <div class="cf-label">AI-Sanad reasons</div>
+          <label class="cf-label" for="aia-lufia-side">AI-Sanad reasons</label>
           <select id="aia-lufia-side"><option value="">— Select position —</option></select>
         </div>
         <div>
-          <div class="cf-label">Opponent persona</div>
+          <label class="cf-label" for="aia-opp">Opponent persona</label>
           <select id="aia-opp">
             <option value="Islamic Scholar">Islamic Scholar</option>
             <option value="Historian">Historian</option>
@@ -276,7 +276,7 @@
           </select>
         </div>
         <div>
-          <div class="cf-label">Rounds each side</div>
+          <label class="cf-label" for="aia-rounds">Rounds each side</label>
           <select id="aia-rounds">
             <option value="2">2 rounds</option>
             <option value="3" selected>3 rounds</option>
@@ -284,7 +284,7 @@
           </select>
         </div>
         <div>
-          <div class="cf-label">Argument depth</div>
+          <label class="cf-label" for="aia-depth">Argument depth</label>
           <select id="aia-depth">
             <option value="10-20">Compact</option>
             <option value="20-50">Brief</option>
@@ -327,7 +327,7 @@
   <!-- ========== TAB: LIVE DEBATE ========== -->
   <div id="tab-live" style="display:none;">
     <div class="kicker" style="margin-top:1rem;">Live Edition</div>
-    <h1 class="headline" style="margin-bottom:.5rem;"><span id="live-headline-text">Reason with AI-Sanad live</span></h1>
+    <h2 class="headline" style="margin-bottom:.5rem;"><span id="live-headline-text">Reason with AI-Sanad live</span></h2>
     <p class="deck" id="live-deck" style="margin-bottom:1.5rem;">Speak your arguments. AI Scholar listens, sharpens her counter in real time, and fires back. Your microphone vs her reasoning.</p>
 
     <div class="broadcast-booth">
@@ -376,7 +376,7 @@
   <!-- ========== TAB: FLOWCHART ========== -->
   <div id="tab-flowchart" style="display:none;">
     <div class="kicker" style="margin-top:1rem;">System Architecture</div>
-    <h1 class="headline" style="margin-bottom:.4rem;">AI-Sanad <em>Reasoning Pipeline</em></h1>
+    <h2 class="headline" style="margin-bottom:.4rem;">AI-Sanad <em>Reasoning Pipeline</em></h2>
     <p class="deck" style="margin-bottom:1.5rem;">Multi-layer AI reasoning system using the SCIPAB framework. Each layer receives all prior layers as chained context. Telemetry is captured at every node.</p>
 
     <svg width="100%" viewBox="0 0 680 920" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-bottom:1.5rem;max-width:700px;">
@@ -572,7 +572,7 @@
   <!-- ========== TAB: HISTORY ========== -->
   <div id="tab-history" style="display:none;">
     <div class="kicker" style="margin-top:1rem;">Archive</div>
-    <h1 class="headline" style="margin-bottom:1.5rem;"><span id="archive-headline-text">Your Argument Record</span></h1>
+    <h2 class="headline" style="margin-bottom:1.5rem;"><span id="archive-headline-text">Your Argument Record</span></h2>
     <div class="archive">
       <div class="archive-head">
         <div class="archive-title">Session Record</div>

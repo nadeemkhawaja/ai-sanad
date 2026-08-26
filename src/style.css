@@ -661,7 +661,6 @@ h1.headline em {
   flex: 1;
   background: var(--paper);
   border: none;
-  outline: none;
   padding: 10px 14px;
   font-family: var(--body);
   font-style: italic;
@@ -922,6 +921,7 @@ select option { background: var(--paper); }
   color: var(--ink);
   outline: none;
 }
+.url-in:focus { border-color: var(--ink); }
 
 .url-use {
   background: var(--ink); border: none;
@@ -1330,6 +1330,7 @@ select option { background: var(--paper); }
   resize: vertical;
   min-height: 50px;
 }
+.sb-in:focus { border-color: var(--ink); }
 
 .sb-submit {
   background: var(--gold);
@@ -1738,20 +1739,6 @@ select option { background: var(--paper); }
   text-transform: uppercase;
 }
 
-.host-speaking-indicator {
-  margin-top: 6px;
-  display: flex;
-  gap: 2px;
-  justify-content: center;
-}
-
-.si-bar {
-  width: 3px;
-  height: 4px;
-  background: var(--red);
-  transition: height .1s;
-}
-
 .host-speech {
   flex: 1;
 }
@@ -1787,27 +1774,6 @@ select option { background: var(--paper); }
   color: var(--ink);
   line-height: 1.7;
   min-height: 36px;
-}
-
-/* Waveform strip */
-.waveform-strip {
-  height: 30px;
-  background: var(--paper2);
-  border-bottom: 1px solid var(--rule);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 0 16px;
-}
-
-.waveform-strip.show { display: flex; }
-
-.ws-bar {
-  width: 3px;
-  background: var(--ink);
-  border-radius: 0;
-  transition: height .1s;
 }
 
 /* Live conversation */
