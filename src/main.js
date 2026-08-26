@@ -182,7 +182,7 @@ const LANGS = {
       readAloud: 'Read Aloud',
       printed: 'PRINTED',
       composing: 'COMPOSING',
-      socraticHead: 'LOFFI CHALLENGES YOUR LOGIC — Answer before we continue',
+      socraticHead: 'AI SCHOLAR CHALLENGES YOUR LOGIC — Answer before we continue',
       socraticSubmit: 'Strengthen arguments → Continue',
       fallacyAlertHead: '⚠ Logical Fallacy Alert — Review Before Arguing',
     }

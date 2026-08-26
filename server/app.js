@@ -64,7 +64,7 @@ app.post('/api/claude', async (req, res) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${API_KEY || 'local'}`,
           'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'ArgueMind'
+          'X-Title': 'AI-Minaret'
         },
         body: JSON.stringify({
           model,

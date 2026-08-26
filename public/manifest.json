@@ -1,7 +1,7 @@
 {
-  "name": "ArgueMind — AI Debate Strategist",
-  "short_name": "ArgueMind",
-  "description": "Sharpen your thinking with 5-layer AI reasoning. Debate any topic with Loffi, your AI strategist.",
+  "name": "AI-Minaret — AI Reasoning Strategist",
+  "short_name": "AI-Minaret",
+  "description": "Sharpen your thinking with 5-layer AI reasoning. Reason through any topic with AI Scholar, your AI strategist.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#faf8f3",
