@@ -2408,3 +2408,49 @@ svg .ts { font-family: var(--mono); font-size: 9px; fill: var(--ink3); }
 
   .acc-arrow { transition: none; }
 }
+
+/* ============================================================
+   PRINT — "Print PDF" button triggers window.print(); the browser's
+   own Save-as-PDF renders this. Only the reasoning layers + a print
+   header print; all interactive chrome is hidden.
+   ============================================================ */
+.print-header {
+  display: none;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 1rem;
+  padding-bottom: .75rem;
+  border-bottom: 2px solid var(--rule-heavy);
+}
+.print-header img { height: 48px; width: auto; }
+.print-header-title {
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 1.3rem;
+}
+.print-header-meta {
+  font-family: var(--cond);
+  font-size: 11px;
+  color: var(--ink2);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+@media print {
+  /* Hide everything interactive/navigational — only the print header,
+     the reasoning layers, score/coach summary, and the disclaimer print. */
+  .masthead,
+  .front-grid, .config-block, .accordion, .press-btn,
+  .tele-box, #tw-progress, .fallacy-alert,
+  .socratic-broadside, .export-strip, .telegram,
+  #settings-modal, .live-avatar-wrap { display: none !important; }
+
+  .print-header { display: flex !important; }
+
+  body { background: #fff; }
+  .page-watermark { width: 55vw; opacity: 1; } /* image itself is baked at 25% */
+
+  .article { break-inside: avoid; page-break-inside: avoid; }
+
+  a[href]::after { content: none; } /* no browser-injected URL clutter */
+}

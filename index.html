@@ -48,6 +48,7 @@
     </button>
 
     <nav class="masthead-nav-right">
+      <button class="nav-item" onclick="printPdf()">Print PDF</button>
       <button class="nav-item" onclick="exportDebate('md')">Export</button>
       <button class="nav-item" onclick="copyAll()">Copy</button>
       <button class="nav-item" onclick="clearAll()">Clear</button>
@@ -208,6 +209,15 @@
       <span id="tw-text">Composing...</span> <span class="press-cursor"></span>
     </div>
 
+    <!-- PRINT-ONLY HEADER (hidden on screen, shown via @media print) -->
+    <div class="print-header">
+      <img src="/assets/logo-icon.png" alt="" aria-hidden="true">
+      <div>
+        <div class="print-header-title">AI-Sanad — Reasoning Record</div>
+        <div class="print-header-meta" id="print-header-meta"></div>
+      </div>
+    </div>
+
     <!-- PIPELINE -->
     <section id="pipeline" class="pipeline-section">
       <div class="pipeline-empty">
@@ -229,6 +239,7 @@
     <!-- EXPORT -->
     <div class="export-strip" id="export-strip">
       <span class="export-label">Print as:</span>
+      <button class="export-btn" onclick="printPdf()">PDF</button>
       <button class="export-btn" onclick="exportDebate('md')">Markdown</button>
       <button class="export-btn" onclick="exportDebate('txt')">Plain Text</button>
       <button class="export-btn" onclick="exportDebate('json')">JSON</button>
@@ -586,7 +597,7 @@
     <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
 
       <div style="background:var(--paper2);padding:14px;border:1px solid var(--rule);margin-bottom:12px;">
-        <div role="heading" aria-level="3" style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Primary Model (Layers 0,2,4,5)</div>
+        <div role="heading" aria-level="3" style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Primary Model (Layers 0,2,5)</div>
         
         <div style="margin-top:10px;">
           <label for="set-primary-provider" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Provider</label>
@@ -616,7 +627,7 @@
       </div>
 
       <div style="background:var(--paper2);padding:14px;border:1px solid var(--rule);margin-bottom:12px;">
-        <div role="heading" aria-level="3" style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Secondary Model (Layers 1,3 — independent perspective)</div>
+        <div role="heading" aria-level="3" style="font-family:var(--cond);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);">Secondary Model (Layers 1,4 — independent perspective)</div>
         
         <div style="margin-top:10px;">
           <label for="set-secondary-provider" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Provider</label>
@@ -641,7 +652,7 @@
         <div id="set-secondary-model-wrap" style="margin-top:10px;">
           <label for="set-secondary-model" style="font-family:var(--cond);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);">Model Name</label>
           <input id="set-secondary-model" type="text" list="free-model-suggestions" placeholder="Leave blank for default" style="width:100%;margin-top:4px;font-size:12px;padding:6px 8px;border:1px solid var(--rule-heavy);background:var(--paper);font-family:var(--mono);">
-          <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:3px;">Layer 1 (Context) &amp; Layer 3 (Counter-Argument) use the secondary model to provide a truly independent analytical perspective.</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);margin-top:3px;">Layer 1 (Context) &amp; Layer 4 (Self-Critique) use the secondary model. Layer 3 (Counter-Argument) is a third lane on its own — always the free tier, so all three groups are answered by different models.</div>
         </div>
         <div id="set-secondary-free-note" style="display:none;margin-top:10px;font-family:var(--mono);font-size:9px;color:var(--ink4);">Free tier rotates across Groq, OpenRouter, NVIDIA, Mistral, and Gemini server-side — model choice isn't set here.</div>
       </div>
@@ -662,7 +673,8 @@
       <div style="background:var(--paper2);border:1px solid var(--rule);padding:10px;font-family:var(--mono);font-size:9px;color:var(--ink3);line-height:1.7;">
         <strong>Provider notes:</strong><br>
         • <strong>Local</strong>: Ollama, LM Studio, or vLLM on your machine/LAN (set via <code>LOCAL_LLM_BASE_URL</code> in .env, or the URL field above) — no key, no cloud, fully private. Only reachable when running the app locally; on a cloud deploy (e.g. Vercel), point this at a publicly reachable endpoint instead.<br>
-        • <strong>Free tier</strong>: rotates server-side across Groq, OpenRouter, NVIDIA, Mistral, and Gemini — tries each in order, falls through on rate limit or missing key. Keys are server env vars (<code>GROQ_API_KEY</code>, <code>OPENROUTER_API_KEY</code>, <code>GEMINI_API_KEY</code>, <code>MISTRAL_API_KEY</code>, <code>NVIDIA_API_KEY</code>), not entered here — set at least one, more gives more headroom against rate limits.<br>
+        • <strong>Free tier</strong>: rotates server-side across Groq, OpenRouter, NVIDIA, Mistral, and Gemini — tries each in order, falls through on rate limit or missing key. Keys are server env vars (<code>GROQ_API_KEY</code>, <code>OPENROUTER_API_KEY</code>, <code>GEMINI_API_KEY</code>, <code>MISTRAL_API_KEY</code>, <code>NVIDIA_API_KEY</code>), not entered here — set at least one, more gives more headroom against rate limits. On localhost/LAN, Primary defaults to Local; anywhere else (e.g. Vercel), it defaults to Free tier automatically.<br>
+        • <strong>Layer 3</strong> always uses its own free-tier lane, regardless of your Primary/Secondary choice above — a third distinct model for the counter-argument step.<br>
         <span style="display:inline-block;margin-top:6px;color:var(--ink4);">Keys are stored safely in your browser (localStorage).</span>
       </div>
 

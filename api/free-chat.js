@@ -1,7 +1,7 @@
 // Vercel serverless function — multi-provider free-tier rotation.
 // Server-side keys (Vercel env vars): GROQ_API_KEY, OPENROUTER_API_KEY,
 // GEMINI_API_KEY, MISTRAL_API_KEY, NVIDIA_API_KEY. See lib/free-providers.mjs.
-import { rotateFreeProviders } from '../lib/free-providers.mjs';
+import { rotateFreeProviders, formatModelLabel } from '../lib/free-providers.mjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
   return res.json({
     choices: [{ message: { content: result.text } }],
-    model: `${result.provider}/${result.model}`,
+    model: formatModelLabel(result.provider, result.model),
     usage: result.usage,
   });
 }

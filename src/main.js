@@ -729,7 +729,7 @@ async function runPipeline() {
       return pool.slice(0, 2).join(' & ');
     }
 
-    // L1 CONTEXT — uses secondary model for independent perspective
+    // L1 CONTEXT — Group A (secondary) model, with Layer 4
     setTW('Layer 1 — Mapping the debate landscape...');
     const src1 = getLayerSources();
     await runLayer(1,'Context Analysis','AI Scholar objectively maps the debate','var(--ink2)',
@@ -737,9 +737,9 @@ async function runPipeline() {
 ${S.lang}Layer 1 — Context Analysis.
 Topic: "${S.topic}". Position: "${S.position}".${refCtx}
 Objectively map the debate. Identify 4-5 key factors. Surface hidden assumptions.
-Do NOT take a position. ${S.depth} words. ${CITE}`, true, src1);
+Do NOT take a position. ${S.depth} words. ${CITE}`, 'secondary', src1);
 
-    // L2 ARGUMENTS — primary model
+    // L2 ARGUMENTS — Group B (primary) model, with Layer 5
     setTW('Layer 2 — Building your strongest arguments...');
     const src2 = getLayerSources();
     await runLayer(2,'Argument Builder','Three evidence-backed arguments in your defence','var(--red)',
@@ -748,7 +748,7 @@ ${S.lang}Layer 2 — Argument Builder.
 Topic: "${S.topic}". Defend: "${S.position}".
 Context from Layer 1: ${S.layers[1]||''}${refCtx}
 3 distinct evidence-backed arguments with claim, evidence, and example.
-${S.depth} words. ${CITE}`, false, src2);
+${S.depth} words. ${CITE}`, 'primary', src2);
 
     // SOCRATIC
     if (S.socraticOn) {
@@ -757,7 +757,7 @@ ${S.depth} words. ${CITE}`, false, src2);
       await waitSocratic();
     }
 
-    // L3 COUNTER — uses secondary model for independent perspective
+    // L3 COUNTER — Group C (tertiary) model — its own lane, no overlap
     setTW('Layer 3 — Generating the strongest opposition...');
     const src3 = getLayerSources();
     await runLayer(3,'Counter-Argument','The strongest case against your position','var(--ink3)',
@@ -767,9 +767,9 @@ Topic: "${S.topic}". Challenge: "${S.position}".
 Prior context (L1): ${S.layers[1]||''}
 Arguments made (L2): ${S.layers[2]||''}
 ${S.socraticAnswers.length?`User reinforced position: ${S.socraticAnswers.join(' | ')}`:''}
-3 genuinely compelling counter-arguments. No strawmen. ${S.depth} words. ${CITE}`, true, src3);
+3 genuinely compelling counter-arguments. No strawmen. ${S.depth} words. ${CITE}`, 'tertiary', src3);
 
-    // L4 CRITIQUE — primary model
+    // L4 CRITIQUE — Group A (secondary) model, with Layer 1
     setTW('Layer 4 — Auditing weaknesses in your case...');
     const src4 = getLayerSources();
     await runLayer(4,'Self-Critique','Honest flaws in the Layer 2 arguments','var(--gold)',
@@ -778,9 +778,9 @@ ${S.lang}Layer 4 — Self-Critique.
 Topic: "${S.topic}". Position: "${S.position}".
 Original arguments (L2): ${S.layers[2]||''}
 Counter-arguments faced (L3): ${S.layers[3]||''}
-3-4 honest weaknesses with improvement suggestions. ${S.depth} words. ${CITE}`, false, src4);
+3-4 honest weaknesses with improvement suggestions. ${S.depth} words. ${CITE}`, 'secondary', src4);
 
-    // L5 FINAL
+    // L5 FINAL — Group B (primary) model, with Layer 2
     setTW('Layer 5 — AI Scholar delivers the final verdict...');
     const src5 = "ALL Uploaded Files, Quran, Sahih Muslim, and Category Sources";
     await runLayer(5,'Final Strategy & Verdict',"AI Scholar's definitive ruling",'var(--ink)',
@@ -794,7 +794,7 @@ Arguments (L2): ${S.layers[2]||''}
 Counters (L3): ${S.layers[3]||''}
 Critique (L4): ${S.layers[4]||''}
 Synthesise all layers. State conditions under which each side wins.
-End with a bold "FINAL VERDICT:" from AI Scholar. ${S.depth} words. ${CITE}`, false, src5);
+End with a bold "FINAL VERDICT:" from AI Scholar. ${S.depth} words. ${CITE}`, 'primary', src5);
 
     // SCORE
     setTW('Scoring the debate...');
@@ -851,20 +851,32 @@ If no fallacies: {"fallacies":[]}`, 400);
 // ================================================================
 // LAYER RUNNER
 // ================================================================
-async function runLayer(n, title, sub, color, prompt, useSecondary=false, layerSourceOverride=null) {
-  // Create article placeholder
+// Provider/model label for a role, for display purposes only. Tertiary has
+// no user-facing provider or fixed model — it's always the free-tier
+// rotation, and which model actually answered isn't known until the
+// response comes back (see usedModel in fillArticle).
+function providerAndModelForRole(role) {
+  if (role === 'tertiary') return { providerStr: 'free', model: null };
   const s = getApiSettings();
-  const providerStr = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
-  const roleStr = useSecondary ? 'Secondary' : 'Primary';
-  
-  const art = makeArticle(n, title, sub, color, true, roleStr, providerStr, layerSourceOverride);
+  const isSecondary = role === 'secondary';
+  const providerStr = (isSecondary ? s.secondaryProvider : s.primaryProvider) || (isSecondary ? 'free' : (isLocalEnv() ? 'local' : 'free'));
+  const model = isSecondary ? getSecondaryModel() : getPrimaryModel();
+  return { providerStr, model };
+}
+
+async function runLayer(n, title, sub, color, prompt, role='primary', layerSourceOverride=null) {
+  // Create article placeholder
+  const { providerStr } = providerAndModelForRole(role);
+  const roleStr = ROLE_LABEL[role];
+
+  const art = makeArticle(n, title, sub, color, true, roleStr, providerStr, layerSourceOverride, role);
   document.getElementById('pipeline').appendChild(art);
   art.scrollIntoView({behavior:'smooth',block:'nearest'});
 
   const t0 = Date.now();
   let text='', inTok=0, outTok=0, usedModel='';
   try {
-    const r = await apiWithTokens(prompt, 1400, useSecondary);
+    const r = await apiWithTokens(prompt, 1400, role);
     text=r.text; inTok=r.in; outTok=r.out; usedModel=r.model;
   } catch(e) { text=`[Layer ${n} error: ${e.message}]`; }
 
@@ -872,20 +884,19 @@ async function runLayer(n, title, sub, color, prompt, useSecondary=false, layerS
   S.layers[n]=text; S.totalIn+=inTok; S.totalOut+=outTok;
 
   // Fill article
-  fillArticle(art, n, title, sub, color, text, inTok, outTok, elapsed, usedModel, layerSourceOverride);
+  fillArticle(art, n, title, sub, color, text, inTok, outTok, elapsed, usedModel, layerSourceOverride, role);
   updateTele();
 }
 
-function makeArticle(n, title, sub, color, loading, roleStr, providerStr, layerSourceOverride) {
+function makeArticle(n, title, sub, color, loading, roleStr, providerStr, layerSourceOverride, role) {
   const div = document.createElement('div');
-  const useSecondary = (n === 1 || n === 3);
-  const s = getApiSettings();
-  const fallbackProvider = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
-  const actualProviderStr = providerStr || fallbackProvider;
-  const actualRoleStr = roleStr || (useSecondary ? 'Secondary' : 'Primary');
-  const targetModel = useSecondary ? getSecondaryModel() : getPrimaryModel();
+  role = role || LAYER_ROLE[n] || 'primary';
+  const fallback = providerAndModelForRole(role);
+  const actualProviderStr = providerStr || fallback.providerStr;
+  const actualRoleStr = roleStr || ROLE_LABEL[role];
+  const targetModel = fallback.model || 'rotating…';
   const targetModelInfo = `${actualRoleStr} Model (${actualProviderStr.toUpperCase()}) · ${targetModel}`;
-  
+
   let sourceLabel = layerSourceOverride || S.source.split(' (')[0];
   if (!layerSourceOverride && S.uploadFileNames && S.uploadFileNames.length > 0) {
     sourceLabel += ` & ${S.uploadFileNames.join(', ')}`;
@@ -912,7 +923,7 @@ function makeArticle(n, title, sub, color, loading, roleStr, providerStr, layerS
   return div;
 }
 
-function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, usedModel, layerSourceOverride) {
+function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, usedModel, layerSourceOverride, role) {
   const SCIPAB = {
     1: { label:'S — Situation', desc:'Map the debate landscape' },
     2: { label:'C — Complication', desc:'Build your strongest arguments' },
@@ -938,11 +949,10 @@ function fillArticle(div, n, title, sub, color, text, inTok, outTok, elapsed, us
   const efficiency = inTok > 0 ? (outTok/inTok).toFixed(2) : '—';
   const effColor = inTok > 0 && (outTok/inTok) < 0.6 ? 'color:var(--red)' : '';
   
-  const useSecondary = (n === 1 || n === 3);
-  const s = getApiSettings();
-  const providerStr = (useSecondary ? s.secondaryProvider : s.primaryProvider) || (useSecondary ? 'free' : 'local');
-  const roleStr = useSecondary ? 'Secondary' : 'Primary';
-  const targetModelInfo = `${roleStr} (${providerStr.toUpperCase()}) · ${usedModel || (useSecondary ? getSecondaryModel() : getPrimaryModel())}`;
+  role = role || LAYER_ROLE[n] || 'primary';
+  const { providerStr, model } = providerAndModelForRole(role);
+  const roleStr = ROLE_LABEL[role];
+  const targetModelInfo = `${roleStr} (${providerStr.toUpperCase()}) · ${usedModel || model || 'unknown'}`;
 
   let sourceLabel = layerSourceOverride || S.source.split(' (')[0];
   if (!layerSourceOverride && S.uploadFileNames && S.uploadFileNames.length > 0) {
@@ -1551,6 +1561,21 @@ function exportDebate(fmt) {
   a.click();
   telegram(`Printed as .${ext}`,'ok');
 }
+// Print-to-PDF: no client-side PDF library — the browser's own print dialog
+// (Save as PDF) renders index.html's @media print rules, which hide all UI
+// chrome and show only the topic/position header + reasoning layers, with
+// the watermark logo behind the content.
+function printPdf() {
+  if (!S.topic) { telegram('No dispatch to print', 'err'); return; }
+  const meta = document.getElementById('print-header-meta');
+  if (meta) {
+    const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    meta.innerHTML = `<strong>${esc(S.topic)}</strong><br>Position: ${esc(S.position || '—')} &nbsp;·&nbsp; ${date}`;
+  }
+  window.print();
+}
+window.printPdf = printPdf;
+
 function copyAll() {
   const titles={1:'Context Analysis',2:'Argument Builder',3:'Counter-Argument',4:'Self-Critique',5:'Final Strategy'};
   let out='';
@@ -1639,6 +1664,21 @@ const FREE_MODEL_SUGGESTIONS = [
 
 const VALID_PROVIDERS = new Set(['local', 'free']);
 
+// Local (Gemma) only makes sense where the browser is actually running near
+// the machine that can reach it — localhost/LAN. On a real deployment (e.g.
+// Vercel), default to the free tier instead so a fresh visit just works.
+function isLocalEnv() {
+  const h = location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1' || h === '::1') return true;
+  return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(h);
+}
+
+// Layer → model-role map. Three independent lanes so Layers {1,4}, {2,5},
+// and {3} are never accidentally answered by the same model — Layer 0
+// (optional fallacy scan) rides along with Group B.
+const LAYER_ROLE = { 0: 'primary', 1: 'secondary', 2: 'primary', 3: 'tertiary', 4: 'secondary', 5: 'primary' };
+const ROLE_LABEL = { primary: 'Primary', secondary: 'Secondary', tertiary: 'Tertiary' };
+
 function getApiSettings() {
   let s;
   try { s = JSON.parse(localStorage.getItem('am_settings') || '{}'); } catch { s = {}; }
@@ -1654,7 +1694,7 @@ function getApiSettings() {
 
 function getPrimaryModel() {
   const s = getApiSettings();
-  const provider = s.primaryProvider || 'local';
+  const provider = s.primaryProvider || (isLocalEnv() ? 'local' : 'free');
   return s.primaryModel || DEFAULT_MODELS.primary[provider] || DEFAULT_MODELS.primary.free;
 }
 
@@ -1665,9 +1705,9 @@ function getSecondaryModel() {
 }
 
 // Retry transient failures (rate limit / overloaded) up to 2 times.
-async function _apiFetchRetry(prompt, maxTokens, useSecondary) {
+async function _apiFetchRetry(prompt, maxTokens, role) {
   for (let attempt = 0; ; attempt++) {
-    const r = await _apiFetch(prompt, maxTokens, useSecondary);
+    const r = await _apiFetch(prompt, maxTokens, role);
     if ((r.status === 429 || r.status === 503 || r.status === 529) && attempt < 2) {
       telegram(`Model busy (${r.status}) — retrying in 4s… (${attempt + 1}/2)`, 'err');
       await new Promise(s => setTimeout(s, 4000));
@@ -1677,16 +1717,16 @@ async function _apiFetchRetry(prompt, maxTokens, useSecondary) {
   }
 }
 
-async function api(prompt, maxTokens=1200, useSecondary=false) {
-  const r = await _apiFetchRetry(prompt, maxTokens, useSecondary);
+async function api(prompt, maxTokens=1200, role='primary') {
+  const r = await _apiFetchRetry(prompt, maxTokens, role);
   if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error?.message || e.error || `API error ${r.status}`); }
   const d = await r.json();
   // Anthropic format: text block in d.content | OpenRouter/OpenAI format: d.choices[0].message.content
   return d.content?.find(b => b.type === 'text')?.text || d.choices?.[0]?.message?.content || '';
 }
 
-async function apiWithTokens(prompt, maxTokens=1200, useSecondary=false) {
-  const r = await _apiFetchRetry(prompt, maxTokens, useSecondary);
+async function apiWithTokens(prompt, maxTokens=1200, role='primary') {
+  const r = await _apiFetchRetry(prompt, maxTokens, role);
   if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error?.message || e.error || `API error ${r.status}`); }
   const d = await r.json();
   const text = d.content?.find(b => b.type === 'text')?.text || d.choices?.[0]?.message?.content || '';
@@ -1695,10 +1735,23 @@ async function apiWithTokens(prompt, maxTokens=1200, useSecondary=false) {
   return { text, in: inTok, out: outTok, model: d.model || 'Unknown Model' };
 }
 
-async function _apiFetch(prompt, maxTokens, useSecondary) {
+async function _apiFetch(prompt, maxTokens, role='primary') {
   const s = getApiSettings();
-  const provider = useSecondary ? (s.secondaryProvider || 'free') : (s.primaryProvider || 'local');
-  const model = useSecondary ? getSecondaryModel() : getPrimaryModel();
+
+  if (role === 'tertiary') {
+    // Layer 3's own lane: always the free-tier rotation, no user-facing
+    // provider setting, no local option — this guarantees a 3rd distinct
+    // model without a 3rd Settings panel. See lib/free-providers.mjs.
+    return fetch('/api/free-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ max_tokens: maxTokens, role: 'tertiary', messages: [{ role: 'user', content: prompt }] })
+    });
+  }
+
+  const isSecondary = role === 'secondary';
+  const provider = isSecondary ? (s.secondaryProvider || 'free') : (s.primaryProvider || (isLocalEnv() ? 'local' : 'free'));
+  const model = isSecondary ? getSecondaryModel() : getPrimaryModel();
 
   if (provider === 'local') {
     // Ollama / LM Studio / vLLM, via the server proxy (avoids CORS).
@@ -1708,7 +1761,7 @@ async function _apiFetch(prompt, maxTokens, useSecondary) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        baseUrl: useSecondary ? (s.secondaryLocalUrl || '') : (s.primaryLocalUrl || ''),
+        baseUrl: isSecondary ? (s.secondaryLocalUrl || '') : (s.primaryLocalUrl || ''),
         model, max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -1718,13 +1771,12 @@ async function _apiFetch(prompt, maxTokens, useSecondary) {
   // Gemini (lib/free-providers.mjs). Keys live server-side (.env locally,
   // Vercel env vars in prod) — the browser never holds them, so nothing to
   // configure per-visitor. Falls through providers on missing key or error.
-  // Primary/secondary use different rotation orders so the two roles land on
-  // different models when possible — same intent as Local's separate Gemma
-  // (primary) vs free tier (secondary) split.
+  // Each role uses a different rotation order so the three lanes land on
+  // different models when possible.
   return fetch('/api/free-chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ max_tokens: maxTokens, role: useSecondary ? 'secondary' : 'primary', messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ max_tokens: maxTokens, role, messages: [{ role: 'user', content: prompt }] })
   });
 }
 // ================================================================
@@ -1732,7 +1784,7 @@ async function _apiFetch(prompt, maxTokens, useSecondary) {
 // ================================================================
 function openSettings() {
   const s = getApiSettings();
-  document.getElementById('set-primary-provider').value = s.primaryProvider || 'local';
+  document.getElementById('set-primary-provider').value = s.primaryProvider || (isLocalEnv() ? 'local' : 'free');
   document.getElementById('set-secondary-provider').value = s.secondaryProvider || 'free';
   document.getElementById('set-primary-local-url').value = s.primaryLocalUrl || '';
   document.getElementById('set-secondary-local-url').value = s.secondaryLocalUrl || '';
@@ -1796,14 +1848,14 @@ function updateSettingsBadge() {
   const s = getApiSettings();
   const el = document.getElementById('settings-badge');
   if (el) {
-    const p = s.primaryProvider || 'local';
+    const p = s.primaryProvider || (isLocalEnv() ? 'local' : 'free');
     const labels = { local:'Local', free:'Free' };
     el.textContent = labels[p] || 'Local';
     el.style.background = p === 'local' ? 'var(--info)' : 'var(--ok)';
   }
   const mastheadModels = document.getElementById('masthead-models');
   if (mastheadModels) {
-    const pp = s.primaryProvider || 'local';
+    const pp = s.primaryProvider || (isLocalEnv() ? 'local' : 'free');
     const sp = s.secondaryProvider || 'free';
     const pm = pp === 'free' ? 'free tier (server-rotated)' : getPrimaryModel();
     const sm = sp === 'free' ? 'free tier (server-rotated)' : getSecondaryModel();
@@ -1962,7 +2014,7 @@ Return ONLY raw JSON in this exact format, with NO markdown formatting, NO backt
 }`;
   
   try {
-    const raw = await api(prompt, 500, true);
+    const raw = await api(prompt, 500, 'secondary');
     let cleanJSON = raw.trim();
     if (cleanJSON.startsWith('```')) {
       cleanJSON = cleanJSON.replace(/^```(json)?/, '').replace(/```$/, '').trim();

@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
 import dotenv from 'dotenv';
-import { rotateFreeProviders } from '../lib/free-providers.mjs';
+import { rotateFreeProviders, formatModelLabel } from '../lib/free-providers.mjs';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -123,7 +123,7 @@ app.post('/api/free-chat', async (req, res) => {
 
   return res.json({
     choices: [{ message: { content: result.text } }],
-    model: `${result.provider}/${result.model}`,
+    model: formatModelLabel(result.provider, result.model),
     usage: result.usage,
   });
 });
