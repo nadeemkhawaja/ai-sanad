@@ -14,20 +14,105 @@
   --ink:       #0a0a08;
   --ink2:      #2c2c28;
   --ink3:      #5a5a52;
-  --ink4:      #9a9a8e;
+  /* --ink4 is the quietest legible tier. It sets TEXT (telemetry labels,
+     placeholders, captions), and that text lands on all three paper tiers —
+     so it is tuned against the darkest of them, not the lightest.
+     5.47:1 on --paper · 5.06:1 on --paper2 · 4.58:1 on --paper3. */
+  --ink4:      #66665c;
   --paper:     #faf8f3;
   --paper2:    #f2efea;
   --paper3:    #e8e4dc;
-  --red:       #c41230;
+  --red:       #c41230;   /* 5.69:1 on paper */
   --red2:      #e01d3f;
-  --gold:      #b8860b;
+  /* Inquiry Gold. Reserved for the system asking rather than asserting.
+     Darkened from #b8860b (3.07:1) so paper-on-gold headers clear AA. 5.01:1. */
+  --gold:      #8a6508;
   --rule:      rgba(10,10,8,0.15);
   --rule-heavy: rgba(10,10,8,0.7);
+
+  /* Verdict + status states come in two sets, because this system prints them
+     on both grounds. Using the wrong set is the bug, not the hue.
+     ON PAPER — printed-ink hues, each ≥4.5:1 on --paper: */
+  --ok:        #17683f;   /* 6.41:1 */
+  --info:      #1d5fa8;   /* 6.08:1 */
+  --warn:      #9a6408;   /* 4.71:1 — ochre, deliberately distinct from --gold */
+  /* ON INK — lifted hues for the Score Card head, toast rails, dots on ink
+     blocks. Each ≥7:1 on --ink; they would fail badly on paper. */
+  --ok-ink:    #4ade80;   /* 11.37:1 */
+  --info-ink:  #60a5fa;   /*  7.79:1 */
+  --warn-ink:  #fbbf24;   /* 11.87:1 */
+  --weak-ink:  #f87171;   /*  7.16:1 */
+
+  /* Text on an ink block. Secondary is derived from the foreground rather
+     than being a washed grey, so it stays in the paper's warmth. 7.3:1. */
+  --on-ink:    var(--paper);
+  --on-ink-2:  rgba(250, 248, 243, .62);
+
+  --focus:     var(--red);
+  --focus-on-ink: var(--paper);
 
   --serif:     'Playfair Display', Georgia, serif;
   --body:      'Libre Baskerville', Georgia, serif;
   --cond:      'Barlow Condensed', Arial Narrow, sans-serif;
   --mono:      'Courier Prime', 'Courier New', monospace;
+}
+
+/* ============================================================
+   FOCUS — one system, square, Press Red, never a glow
+   ============================================================ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* On ink-filled surfaces the red ring disappears; switch to paper. */
+:where(.press-btn, .custom-btn, .url-use, .match-run-btn, .sb-submit,
+       .config-header *, .topic-card.selected, .cat-btn.active,
+       .tone-pill.sel, .vmode-btn.sel, .src-btn.sel,
+       .live-ctrl-btn.primary):focus-visible {
+  outline-color: var(--focus-on-ink);
+  outline-offset: -4px;
+}
+
+/* Mouse users keep the clean broadsheet; keyboard users get the ring. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Off-screen but still announced and still focusable. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A file input styled as an ink block. The ring lands on the input, which
+   sits behind the label, so :focus-within carries it to what you can see. */
+.file-label {
+  display: inline-block;
+  padding: 7px 14px;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  font-family: var(--cond);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  transition: background .15s;
+}
+
+.file-label:hover { background: var(--red); }
+
+.file-label:has(+ input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -130,6 +215,14 @@ body {
 .masthead-title {
   text-align: center;
   cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  display: block;
+  width: 100%;
 }
 
 .paper-name {
@@ -153,48 +246,6 @@ body {
   border-bottom: 1px solid var(--rule);
   padding: 2px 0;
 }
-
-/* ============================================================
-   EDITION BANNER
-   ============================================================ */
-.edition-banner {
-  background: var(--red);
-  color: #fff;
-  padding: 6px 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  font-family: var(--cond);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  overflow: hidden;
-}
-
-.edition-tag {
-  background: #fff;
-  color: var(--red);
-  padding: 1px 8px;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: .1em;
-  flex-shrink: 0;
-}
-
-.edition-scroll {
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.edition-scroll span {
-  display: inline-block;
-  animation: marquee 30s linear infinite;
-  opacity: .9;
-}
-
-@keyframes marquee { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
 
 /* ============================================================
    LAYOUT
@@ -292,6 +343,40 @@ h1.headline em {
   border-top: 1px solid var(--rule);
   padding-top: 6px;
   margin-bottom: 1rem;
+}
+
+/* ============================================================
+   FRONT PLATE — the printed cut
+   Unused. Kept because the front page will want a plate eventually,
+   and this is how a broadsheet sets one: hard-ruled, no radius, no
+   shadow, printed down into the paper's own ink range, caption under
+   a hairline. Add a <figure class="front-plate"> when there is an
+   image that belongs to this world.
+   ============================================================ */
+.front-plate {
+  margin: 0 0 1rem;
+  border-top: 1px solid var(--rule-heavy);
+}
+
+.front-plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.06) sepia(.12);
+  margin-top: 10px;
+}
+
+.front-plate figcaption {
+  font-family: var(--cond);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  border-top: 1px solid var(--rule);
+  padding-top: 5px;
+  margin-top: 6px;
 }
 
 /* Stats as newspaper "infographic" boxes */
@@ -470,7 +555,17 @@ h1.headline em {
   overflow: hidden;
 }
 
+/* A real <button>, so it is focusable and operable from the keyboard.
+   The reset undoes the UA button styling; the broadsheet cell is unchanged. */
 .topic-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--paper);
+  border: none;
+  border-radius: 0;
   padding: 11px 13px;
   border-right: 1px solid var(--rule-heavy);
   border-bottom: 1px solid var(--rule-heavy);
@@ -483,8 +578,11 @@ h1.headline em {
 .topic-card:nth-last-child(-n+3) { border-bottom: none; }
 .topic-card:hover { background: var(--paper2); }
 .topic-card.selected { background: var(--ink); color: var(--paper); }
-.topic-card.selected .tc-label { color: rgba(255,255,255,.6); }
-.topic-card.selected .tc-sub { color: rgba(255,255,255,.7); }
+.topic-card.selected .tc-label { color: var(--on-ink-2); }
+.topic-card.selected .tc-sub { color: var(--on-ink-2); }
+
+/* These are spans inside a <button>, so they need to lay out as blocks. */
+.tc-label, .tc-head, .tc-sub { display: block; }
 
 .tc-label {
   font-family: var(--cond);
@@ -519,7 +617,7 @@ h1.headline em {
   top: 10px; right: 10px;
   width: 18px; height: 18px;
   background: var(--red);
-  color: #fff;
+  color: var(--on-ink);
   font-size: 10px;
   font-weight: 900;
   display: none;
@@ -714,7 +812,14 @@ select option { background: var(--paper); }
   margin-bottom: 1rem;
 }
 
+/* Also a real <button> — same reset, same appearance. */
 .acc-head {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  border: none;
+  border-radius: 0;
   padding: 9px 14px;
   background: var(--paper2);
   cursor: pointer;
@@ -779,7 +884,7 @@ select option { background: var(--paper); }
 .src-btn:nth-child(4n) { border-right: none; }
 .src-btn:hover { background: var(--paper2); }
 .src-btn.sel { background: var(--ink); color: var(--paper); }
-.src-btn.sel .src-domain { color: rgba(255,255,255,.6); }
+.src-btn.sel .src-domain { color: var(--on-ink-2); }
 
 .src-name { font-size: 11px; font-weight: 700; margin-bottom: 1px; }
 .src-domain { font-size: 9px; font-family: var(--mono); color: var(--ink3); }
@@ -1250,10 +1355,11 @@ select option { background: var(--paper); }
   line-height: 1;
 }
 
-.score-total.e { color: #4ade80; }
-.score-total.g { color: #60a5fa; }
-.score-total.f { color: #fbbf24; }
-.score-total.w { color: #f87171; }
+/* These print on the ink header bar, so they use the lifted set (7.2–11.9:1). */
+.score-total.e { color: var(--ok-ink); }
+.score-total.g { color: var(--info-ink); }
+.score-total.f { color: var(--warn-ink); }
+.score-total.w { color: var(--weak-ink); }
 
 .score-inset-body {
   padding: 14px;
@@ -1414,7 +1520,7 @@ select option { background: var(--paper); }
 .match-round-label {
   font-family: var(--mono);
   font-size: 10px;
-  color: rgba(255,255,255,.6);
+  color: var(--on-ink-2);
 }
 
 .match-combatants {
@@ -1605,7 +1711,7 @@ select option { background: var(--paper); }
 .hn-title {
   font-family: var(--mono);
   font-size: 8px;
-  color: rgba(255,255,255,.6);
+  color: var(--on-ink-2);
   letter-spacing: .08em;
   margin-top: 4px;
   text-transform: uppercase;
@@ -1650,7 +1756,8 @@ select option { background: var(--paper); }
 
 .host-status-dot.speaking { background: var(--red); animation: blink .5s infinite; }
 .host-status-dot.thinking { background: var(--gold); animation: blink .8s infinite; }
-.host-status-dot.idle { background: #4ade80; }
+/* This dot prints on the paper-backed booth, so it takes the paper set. */
+.host-status-dot.idle { background: var(--ok); }
 
 .host-text {
   font-family: var(--serif);
@@ -1678,7 +1785,7 @@ select option { background: var(--paper); }
 .ws-bar {
   width: 3px;
   background: var(--ink);
-  border-radius: 1px;
+  border-radius: 0;
   transition: height .1s;
 }
 
@@ -1927,15 +2034,26 @@ select option { background: var(--paper); }
 
 .archive-clear:hover { color: var(--red); }
 
+/* A real <button>, same reset as .topic-card. */
 .archive-entry {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 0;
   padding: 11px 14px;
   border-bottom: 1px solid var(--rule);
   display: grid;
   grid-template-columns: 1fr auto;
+  align-items: center;
   gap: 10px;
   cursor: pointer;
   transition: background .15s;
 }
+
+.ae-topic, .ae-meta, .ae-score { display: block; }
 
 .archive-entry:last-child { border-bottom: none; }
 .archive-entry:hover { background: var(--paper2); }
@@ -2013,14 +2131,17 @@ select option { background: var(--paper); }
   letter-spacing: .04em;
   z-index: 9999;
   transform: translateY(150%);
-  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  /* Confident deceleration, not a spring. The overshoot was the one
+     bouncy curve in a system that decelerates everywhere else. */
+  transition: transform .3s cubic-bezier(.16, 1, .3, 1);
   border: 2px solid var(--paper);
   max-width: 320px;
 }
 
 .telegram.show { transform: translateY(0); }
-.telegram.ok { border-left: 4px solid #4ade80; }
-.telegram.err { border-left: 4px solid var(--red); }
+/* Rails print on the toast's ink ground. */
+.telegram.ok { border-left: 4px solid var(--ok-ink); }
+.telegram.err { border-left: 4px solid var(--red2); }
 
 /* ============================================================
    SCROLLBAR
@@ -2030,105 +2151,20 @@ select option { background: var(--paper); }
 ::-webkit-scrollbar-thumb { background: var(--ink3); }
 ::-webkit-scrollbar-thumb:hover { background: var(--ink); }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media(max-width: 768px) {
-  .front-grid { grid-template-columns: 1fr; }
-  .col-divider { display: none; }
-  .config-inner { grid-template-columns: 1fr 1fr; }
-  .src-grid { grid-template-columns: repeat(2,1fr); }
-  .voice-grid { grid-template-columns: 1fr 1fr; }
-  .tele-box { grid-template-columns: repeat(3,1fr); }
-  .article-text, .coach-text { columns: 1; }
-  .score-inset-body { grid-template-columns: 1fr; }
-  .score-col { border-right: none; padding: 0; border-bottom: 1px solid var(--rule); padding-bottom: 12px; margin-bottom: 12px; }
-  .score-col:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-  .match-combatants { grid-template-columns: 1fr; }
-  .match-vs { display: none; }
-  .match-fighter { border-right: none; }
-  .live-turn { grid-template-columns: 70px 1fr; }
-  .masthead-main { grid-template-columns: 1fr; gap: 6px; }
-  .masthead-nav-left, .masthead-nav-right { display: none; }
-  .topic-grid { grid-template-columns: repeat(2,1fr); }
-  .topic-card:nth-child(3n) { border-right: 1px solid var(--rule-heavy); }
-  .topic-card:nth-child(even) { border-right: none; }
-  .topic-card:nth-last-child(-n+3) { border-bottom: 1px solid var(--rule-heavy); }
-  .topic-card:nth-last-child(-n+2) { border-bottom: none; }
-}
+/* SVG Flowchart Styles — on the system palette, not a private one */
+svg rect { fill: var(--paper2); }
+svg .th { font-family: var(--cond); font-weight: 800; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; fill: var(--ink); }
+svg .ts { font-family: var(--mono); font-size: 9px; fill: var(--ink3); }
 
-/* ============================================================
-   MULTILINGUAL — RTL layout + Arabic/Urdu fonts
-   ============================================================ */
-html[dir="rtl"] body { direction: rtl; text-align: right; }
-html[dir="rtl"] .masthead-nav-left { order: 3; }
-html[dir="rtl"] .masthead-nav-right { order: 1; }
-html[dir="rtl"] .masthead-main { grid-template-columns: 1fr auto 1fr; }
-html[dir="rtl"] .front-grid { direction: rtl; }
-html[dir="rtl"] .cat-strip { flex-direction: row-reverse; }
-html[dir="rtl"] .article-text { direction: rtl; text-align: right; }
-html[dir="rtl"] .coach-text { direction: rtl; text-align: right; }
-html[dir="rtl"] .article-footer { flex-direction: row-reverse; }
-html[dir="rtl"] .acc-head { flex-direction: row-reverse; }
-html[dir="rtl"] .config-inner { direction: rtl; }
-html[dir="rtl"] .live-turn { direction: rtl; }
-html[dir="rtl"] .archive-entry { direction: rtl; }
-
-/* Arabic / Urdu: use system fonts that support Naskh script */
-html[lang="ar"] .article-text,
-html[lang="ar"] .coach-text,
-html[lang="ar"] .ltext,
-html[lang="ar"] .pull-quote,
-html[lang="ar"] .host-text,
-html[lang="ar"] .lt-text,
-html[lang="ar"] .exchange-text,
-html[lang="ur"] .article-text,
-html[lang="ur"] .coach-text,
-html[lang="ur"] .ltext,
-html[lang="ur"] .pull-quote,
-html[lang="ur"] .host-text,
-html[lang="ur"] .lt-text,
-html[lang="ur"] .exchange-text {
-  font-family: 'Noto Naskh Arabic', 'Arabic Typesetting', 'Segoe UI', Tahoma, sans-serif;
-  font-size: 15px;
-  line-height: 2.0;
-}
-
-/* Language switcher flags */
-.lang-switcher {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-  margin-left: 6px;
-}
-.lang-btn {
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  padding: 3px 6px;
-  font-size: 15px;
-  cursor: pointer;
-  opacity: .55;
-  transition: all .15s;
-  line-height: 1;
-}
-.lang-btn:hover { opacity: .85; border-color: var(--rule); }
-.lang-btn.active { opacity: 1; border-color: var(--rule-heavy); background: var(--paper2); }
-
-/* SVG Flowchart Styles */
-svg rect { fill: #F4F4F0; }
-svg .th { font-family: var(--cond); font-weight: 800; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; fill: #111; }
-svg .ts { font-family: var(--mono); font-size: 9px; fill: #5F5E5A; }
-
-.c-gray rect { stroke: #888780; }
-.c-amber rect { stroke: #BA7517; }
-.c-amber .ts, .c-amber .th { fill: #BA7517; }
-.c-teal rect { stroke: #0F6E56; }
-.c-teal .ts, .c-teal .th { fill: #0F6E56; }
-.c-red rect { stroke: #B22222; }
-.c-red .ts, .c-red .th { fill: #B22222; }
-.c-gold rect { stroke: #8C6A28; }
-.c-gold .ts, .c-gold .th { fill: #8C6A28; }
+.c-gray rect { stroke: var(--rule-heavy); }
+.c-amber rect { stroke: var(--warn); }
+.c-amber .ts, .c-amber .th { fill: var(--warn); }
+.c-teal rect { stroke: var(--ok); }
+.c-teal .ts, .c-teal .th { fill: var(--ok); }
+.c-red rect { stroke: var(--red); }
+.c-red .ts, .c-red .th { fill: var(--red); }
+.c-gold rect { stroke: var(--gold); }
+.c-gold .ts, .c-gold .th { fill: var(--gold); }
 /* ============================================================
    SETTINGS BADGE
    ============================================================ */
@@ -2136,9 +2172,9 @@ svg .ts { font-family: var(--mono); font-size: 9px; fill: #5F5E5A; }
 .settings-badge {
   display: inline-block;
   padding: 1px 5px;
-  border-radius: 3px;
+  border-radius: 0;
   background: var(--red);
-  color: #fff;
+  color: var(--on-ink);
   font-size: 8px;
   font-family: var(--cond);
   font-weight: 800;
@@ -2148,7 +2184,12 @@ svg .ts { font-family: var(--mono); font-size: 9px; fill: #5F5E5A; }
 }
 
 /* ============================================================
-   MOBILE RESPONSIVE — < 768px
+   RESPONSIVE — < 768px
+   One block. Two competing 768px blocks previously fought over
+   .topic-grid, .tele-box and .match-combatants; the loser's rules
+   are gone, and the rules that targeted classes with no markup
+   (.mobile-settings-bar, .pipeline-article, .hist-entry, .stat-box)
+   went with them.
    ============================================================ */
 @media (max-width: 768px) {
   body { font-size: 12px; }
@@ -2160,6 +2201,10 @@ svg .ts { font-family: var(--mono); font-size: 9px; fill: #5F5E5A; }
     text-align: center;
   }
 
+  /* The nav stays reachable. It used to be display:none here, while a
+     second rule hid the settings button in favour of a .mobile-settings-bar
+     that was never added to the markup — which left API-key settings with
+     no route in on a phone. */
   .masthead-nav-left, .masthead-nav-right {
     justify-content: center;
     flex-wrap: wrap;
@@ -2187,63 +2232,158 @@ svg .ts { font-family: var(--mono); font-size: 9px; fill: #5F5E5A; }
   .paper-name { font-size: 1.4rem; }
   .paper-tagline { font-size: 9px; }
 
-  .config-inner {
-    grid-template-columns: 1fr 1fr;
-  }
-
+  .config-inner { grid-template-columns: 1fr 1fr; }
   .config-inner select,
-  .config-inner input {
-    font-size: 11px;
-  }
+  .config-inner input { font-size: 11px; }
 
-  .stat-box { padding: 6px 10px; }
-  .stat-num { font-size: 1.4rem; }
+  .src-grid { grid-template-columns: repeat(2, 1fr); }
+  .src-btn:nth-child(4n) { border-right: 1px solid var(--rule-heavy); }
+  .src-btn:nth-child(even) { border-right: none; }
+
+  .voice-grid { grid-template-columns: 1fr 1fr; }
 
   .cat-strip { flex-wrap: wrap; gap: 4px; }
   .cat-btn { font-size: 9px; padding: 5px 8px; }
   .sub-strip { flex-wrap: wrap; }
   .sub-btn { font-size: 9px; padding: 3px 8px; }
+
+  /* Single column. The 3n / -n+3 edge rules below are written for the
+     3-up desktop grid, so they are re-stated for a 1-up grid instead of
+     left to leave a stray rule hanging off the last card in each row. */
   .topic-grid { grid-template-columns: 1fr; }
+  .topic-card,
+  .topic-card:nth-child(3n) { border-right: none; }
+  .topic-card:nth-last-child(-n+3) { border-bottom: 1px solid var(--rule-heavy); }
+  .topic-card:last-child { border-bottom: none; }
 
   .tone-row { flex-wrap: wrap; gap: 4px; }
 
   .press-btn { font-size: 13px; padding: 12px 16px; }
 
-  .tele-box { flex-wrap: wrap; gap: 4px; }
-  .tele-cell { min-width: 70px; padding: 6px 8px; }
+  .tele-box { grid-template-columns: repeat(3, 1fr); }
+  .tele-cell { padding: 6px 8px; }
+  .tele-cell:nth-child(3n) { border-right: none; }
+  .tele-cell:nth-child(-n+3) { border-bottom: 1px solid var(--rule-heavy); }
 
-  .pipeline-article { padding: 1rem; }
+  .article-text, .coach-text { columns: 1; }
   .article-body { font-size: 12px; }
+  .article-body, .article-footer { padding-left: 40px; }
 
-  .masthead-nav-right .settings-btn { display: none; } /* moved below */
-  .mobile-settings-bar {
-    display: flex;
-    justify-content: center;
-    padding: 4px 1rem;
-    background: var(--paper2);
-    border-top: 1px solid var(--rule);
-    gap: 8px;
-  }
+  .score-inset-body { grid-template-columns: 1fr; }
+  .score-col { border-right: none; padding: 0 0 12px; border-bottom: 1px solid var(--rule); margin-bottom: 12px; }
+  .score-col:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
 
   .export-strip { flex-wrap: wrap; gap: 4px; padding: 10px 1rem; }
   .export-btn { font-size: 10px; padding: 5px 10px; }
 
   /* Arena & Live */
-  .match-combatants { flex-direction: column; }
-  .match-fighter { border: none !important; padding: 8px 0; }
-
-  /* Archive */
-  .archive { padding: 0; }
-  .hist-entry { padding: 10px; }
+  .match-combatants { grid-template-columns: 1fr; }
+  .match-vs { display: none; }
+  .match-fighter { border-right: none; border-bottom: 1px solid var(--rule-heavy); padding: 12px; }
+  .match-fighter:last-child { border-bottom: none; }
+  .live-turn { grid-template-columns: 70px 1fr; }
+  .mr-scores { grid-template-columns: 1fr; }
+  .mr-fighter { border-right: none; border-bottom: 1px solid var(--rule-heavy); }
+  .mr-fighter:last-child { border-bottom: none; }
 }
 
 @media (max-width: 480px) {
   .config-inner { grid-template-columns: 1fr; }
   .tone-pill { font-size: 9px; padding: 3px 8px; }
-  .tele-cell { min-width: 60px; }
+  .tele-box { grid-template-columns: repeat(2, 1fr); }
+  .tele-cell:nth-child(3n) { border-right: 1px solid var(--rule-heavy); }
+  .tele-cell:nth-child(even) { border-right: none; }
+  .tele-cell:nth-child(-n+4) { border-bottom: 1px solid var(--rule-heavy); }
+  .src-grid { grid-template-columns: 1fr; }
+  .src-btn, .src-btn:nth-child(4n) { border-right: none; }
+  .voice-grid { grid-template-columns: 1fr; }
+  .live-turn { grid-template-columns: 1fr; gap: 4px; }
+}
+
+/* ============================================================
+   TOUCH TARGETS — WCAG 2.5.5 / 2.5.8
+   Broadsheet chrome is deliberately small: 10px condensed labels in
+   3px of padding. On touch, that becomes real spacing rather than an
+   invisible overlay — an overlay large enough to matter would have
+   overlapped its neighbours in these tightly packed rows (four
+   language flags at 33px wide), trading a small target for a mis-tap.
+   The type stays put; only the padding grows.
+   ============================================================ */
+@media (pointer: coarse), (max-width: 768px) {
+  .nav-item, .cat-btn, .sub-btn, .tone-pill, .art-btn,
+  .export-btn, .archive-clear, .vmode-btn, .settings-btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-item, .art-btn, .export-btn, .archive-clear { padding: 0 12px; }
+  .cat-btn, .sub-btn, .tone-pill { padding: 0 12px; }
+  .settings-btn { min-width: 44px; padding: 0 8px; }
+
+  /* Row gaps keep adjacent targets from sharing an edge. */
+  .cat-strip { gap: 2px; }
+
+  /* Already generous — just guarantee the floor. */
+  .press-btn, .match-run-btn, .live-ctrl-btn, .custom-btn,
+  .url-use, .sb-submit, .file-label {
+    min-height: 44px;
+  }
+
+  .topic-card, .archive-entry, .src-btn, .acc-head { min-height: 44px; }
 }
 
 /* iOS safe area padding */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   body { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   Not a blanket kill. Every looping indicator in this interface
+   encodes a state — live, composing, speaking, thinking, recording
+   — so each one keeps its colour and drops only the movement.
+   Nothing that told you something stops telling you.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* Blinking indicators hold steady at full opacity, colour intact. */
+  .ticker-dot,
+  .press-cursor,
+  .article-status.running,
+  .host-status-dot.speaking,
+  .host-status-dot.thinking,
+  .live-ctrl-btn.recording {
+    animation: none;
+    opacity: 1;
+  }
+
+  /* The recording button loses its pulse ring but keeps the red inversion
+     that says "live", plus a ring that does not move. */
+  .live-ctrl-btn.recording {
+    box-shadow: 0 0 0 3px rgba(196, 18, 48, .35);
+  }
+
+  /* Layers arrive rather than rise into place. */
+  .article,
+  .match-exchange,
+  .live-turn {
+    animation: none;
+  }
+
+  /* Score bars land at their value instead of counting up to it;
+     the number beside them was always the real reading. */
+  .score-bar { transition: none; }
+
+  /* The PRESS wipe becomes a plain state change — still unmistakably
+     a hover, just not a travelling panel. */
+  .press-btn::before { transition: none; }
+  .press-btn:hover { background: var(--red); }
+  .press-btn:hover::before { left: 0; }
+
+  /* Toast appears in place; the overshoot was the only spring here. */
+  .telegram { transition: opacity .12s linear; transform: translateY(0); opacity: 0; }
+  .telegram.show { opacity: 1; }
+
+  .acc-arrow { transition: none; }
 }

@@ -124,9 +124,7 @@ const S = {
 
 
 // ================================================================
-// MULTILINGUAL SYSTEM
-// 4 languages: English · Arabic · Urdu · Spanish
-// UI strings, RTL layout, prompt injection, voice fallback
+// UI STRINGS — English only
 // ================================================================
 
 const LANGS = {
@@ -189,183 +187,6 @@ const LANGS = {
       fallacyAlertHead: '⚠ Logical Fallacy Alert — Review Before Arguing',
     }
   },
-  ar: {
-    code: 'ar', dir: 'rtl', name: 'العربية',
-    promptInstruction: 'اكتب ردك بالكامل باللغة العربية الفصحى. استخدم أسلوباً أكاديمياً واضحاً. ',
-    voiceLang: 'ar-SA',
-    kokoroSupported: false,
-    strings: {
-      appTagline: 'استراتيجي النقاش بالذكاء الاصطناعي · شحذ تفكيرك · بتقنية كلود',
-      hostedBy: 'مستضاف من لوفي',
-      selectTopic: 'اختر الموضوع',
-      dispatchPreview: 'معاينة القضية',
-      selectedMotion: 'الموضوع المختار',
-      pickTopic: 'اختر موضوعاً وموقفاً →',
-      printSettings: 'إعدادات الطباعة',
-      fallacyScan: 'فحص المغالطات',
-      socraticDrill: 'التدريب السقراطي',
-      liveAvatar: 'الصورة المباشرة',
-      customPlaceholder: 'أو اقترح موضوعك الخاص...',
-      customBtn: 'إرسال ←',
-      configureArg: 'تكوين حجتك',
-      yourPosition: 'موقفك',
-      persona: 'الشخصية',
-      depth: 'عمق الحجة',
-      language: 'اللغة',
-      knowledgeSource: 'مصدر المعرفة',
-      toneLabel: 'النبرة —',
-      runBtn: '⊕ تشغيل محرك التفكير من 7 طبقات',
-      runSub: 'لوفي ستجادل · تتساءل · تعارض · تنتقد · وتصدر حكمها',
-      running: 'جاري التأليف...',
-      debate: 'نقاش',
-      arena: 'الحلبة',
-      live: 'مباشر',
-      flowchart: 'المخطط',
-      archive: 'الأرشيف',
-      export: 'تصدير',
-      copy: 'نسخ',
-      clear: 'مسح',
-      debateTab: 'إصدار اليوم',
-      headline: 'شحذ تفكيرك مع',
-      headlineEm: 'AI-Minaret',
-      deck: 'استراتيجي النقاش بالذكاء الاصطناعي. لوفي تجادل وتتحدى وتشكك في منطقك وترد عليك في الوقت الفعلي.',
-      byline: 'مستضاف من لوفي · استراتيجي نقاش الذكاء الاصطناعي · جميع الإصدارات',
-      statCats: 'الفئات', statLayers: 'الطبقات', statTopics: 'الموضوعات', statModes: 'الأوضاع',
-      arenaTitle: 'لوفي في مواجهة المعارض',
-      arenaDeck: 'شاهد متناقشَين من الذكاء الاصطناعي يواجهان بعضهما. لوفي تجادل في أحد الجانبين؛ أنت تعيّن شخصية المعارض.',
-      liveTitle: 'ناقش لوفي مباشرة',
-      liveDeck: 'تكلم بحججك. لوفي تستمع وتصوغ ردها في الوقت الفعلي.',
-      archiveTitle: 'سجل نقاشاتك',
-      openFloor: 'افتح الجلسة',
-      micSpeak: 'المايكروفون — امسك للتحدث',
-      endJudge: 'إنهاء والحكم',
-      copyBtn: 'نسخ',
-      readAloud: 'اقرأ بصوت عالٍ',
-      printed: 'مطبوع',
-      composing: 'جاري التأليف',
-      socraticHead: 'لوفي تتحدى منطقك — أجب قبل المتابعة',
-      socraticSubmit: 'تعزيز الحجج ← المتابعة',
-      fallacyAlertHead: '⚠ تنبيه مغالطة منطقية — راجع قبل الجدال',
-    }
-  },
-  ur: {
-    code: 'ur', dir: 'rtl', name: 'اردو',
-    promptInstruction: 'اپنا مکمل جواب اردو میں لکھیں۔ واضح اور معیاری اردو استعمال کریں۔ ',
-    voiceLang: 'ur-PK',
-    kokoroSupported: false,
-    strings: {
-      appTagline: 'اے آئی بحث حکمت عملی · اپنی سوچ تیز کریں · کلود سے چلائی گئی',
-      hostedBy: 'لوفی کی میزبانی میں',
-      selectTopic: 'موضوع منتخب کریں',
-      dispatchPreview: 'تحریک کی پیش نظر',
-      selectedMotion: 'منتخب تحریک',
-      pickTopic: 'موضوع اور مؤقف منتخب کریں →',
-      printSettings: 'پرنٹ ترتیبات',
-      fallacyScan: 'غلط استدلال کا اسکین',
-      socraticDrill: 'سقراطی مشق',
-      liveAvatar: 'لائیو اوتار',
-      customPlaceholder: 'یا اپنا موضوع تجویز کریں...',
-      customBtn: 'جمع کریں ←',
-      configureArg: 'اپنی دلیل ترتیب دیں',
-      yourPosition: 'آپ کا مؤقف',
-      persona: 'کردار',
-      depth: 'دلیل کی گہرائی',
-      language: 'زبان',
-      knowledgeSource: 'علم کا ماخذ',
-      toneLabel: 'لہجہ —',
-      runBtn: '⊕ سات پرت استدلال انجن چلائیں',
-      runSub: 'لوفی بحث کرے گی · سوال اٹھائے گی · مخالفت کرے گی · تنقید کرے گی · فیصلہ سنائے گی',
-      running: 'تیار ہو رہا ہے...',
-      debate: 'بحث',
-      arena: 'میدان',
-      live: 'براہ راست',
-      flowchart: 'فلو چارٹ',
-      archive: 'آرکائیو',
-      export: 'برآمد',
-      copy: 'نقل',
-      clear: 'صاف',
-      debateTab: 'آج کا ایڈیشن',
-      headline: 'اپنی سوچ تیز کریں',
-      headlineEm: 'AI-Minaret',
-      deck: 'آپ کا اے آئی بحث حکمت ساز۔ لوفی بحث کرتی ہے، چیلنج کرتی ہے، منطق پر سوال اٹھاتی ہے۔',
-      byline: 'لوفی کی میزبانی میں · اے آئی بحث حکمت ساز · تمام ایڈیشن',
-      statCats: 'زمرے', statLayers: 'پرتیں', statTopics: 'موضوعات', statModes: 'طریقے',
-      arenaTitle: 'لوفی بمقابلہ حریف',
-      arenaDeck: 'دو اے آئی بحث کاروں کو آمنے سامنے دیکھیں۔ لوفی ایک طرف دلیل دیتی ہے؛ آپ حریف کا کردار مقرر کریں۔',
-      liveTitle: 'لوفی سے براہ راست بحث کریں',
-      liveDeck: 'اپنی دلیلیں بولیں۔ لوفی سنتی ہے اور فوری جواب دیتی ہے۔',
-      archiveTitle: 'آپ کا بحث ریکارڈ',
-      openFloor: 'فلور کھولیں',
-      micSpeak: 'مائیک — بولنے کے لیے تھامیں',
-      endJudge: 'ختم کریں اور فیصلہ کریں',
-      copyBtn: 'نقل',
-      readAloud: 'بلند آواز میں پڑھیں',
-      printed: 'مطبوع',
-      composing: 'تیار ہو رہا ہے',
-      socraticHead: 'لوفی آپ کی منطق کو چیلنج کرتی ہے — جاری رکھنے سے پہلے جواب دیں',
-      socraticSubmit: 'دلائل مضبوط کریں ← جاری رکھیں',
-      fallacyAlertHead: '⚠ منطقی غلطی کا انتباہ — بحث سے پہلے نظرثانی کریں',
-    }
-  },
-  es: {
-    code: 'es', dir: 'ltr', name: 'Español',
-    promptInstruction: 'Escribe toda tu respuesta en español con un estilo académico claro y persuasivo. ',
-    voiceLang: 'es-ES',
-    kokoroSupported: true,
-    strings: {
-      appTagline: 'Estratega de Debate IA · Agudiza tu Pensamiento · Impulsado por Claude',
-      hostedBy: 'Presentado por AI Scholar',
-      selectTopic: 'Seleccionar Tema',
-      dispatchPreview: 'Vista Previa',
-      selectedMotion: 'Moción Seleccionada',
-      pickTopic: 'Elige un tema y posición →',
-      printSettings: 'Configuración',
-      fallacyScan: 'Detector de Falacias',
-      socraticDrill: 'Método Socrático',
-      liveAvatar: 'Avatar en Vivo',
-      customPlaceholder: 'O propón tu propio tema...',
-      customBtn: 'Usar →',
-      configureArg: 'Configura tu Argumento',
-      yourPosition: 'Tu Posición',
-      persona: 'Personaje',
-      depth: 'Profundidad del Argumento',
-      language: 'Idioma',
-      knowledgeSource: 'Fuente de Conocimiento',
-      toneLabel: 'Tono —',
-      runBtn: '⊕ Ejecutar Motor de Razonamiento de 7 Capas',
-      runSub: 'AI Scholar argumentará · cuestionará · rebatirá · criticará · emitirá veredicto',
-      running: 'Componiendo despacho...',
-      debate: 'Debate',
-      arena: 'Arena',
-      live: 'En Vivo',
-      flowchart: 'Diagrama',
-      archive: 'Archivo',
-      export: 'Exportar',
-      copy: 'Copiar',
-      clear: 'Limpiar',
-      debateTab: 'Edición de Hoy',
-      headline: 'Agudiza tu pensamiento con',
-      headlineEm: 'AI-Minaret',
-      deck: 'Tu estratega de debate con IA. AI Scholar argumenta, desafía, cuestiona tu lógica y responde en tiempo real.',
-      byline: 'Presentado por AI Scholar · Estratega de Debate IA · Todas las Ediciones',
-      statCats: 'Categorías', statLayers: 'Capas', statTopics: 'Temas', statModes: 'Modos',
-      arenaTitle: 'AI Scholar vs La Oposición',
-      arenaDeck: 'Observa a dos debatidores de IA enfrentarse. AI Scholar argumenta un lado; tú asignas el personaje del oponente.',
-      liveTitle: 'Debate con AI Scholar en Vivo',
-      liveDeck: 'Expresa tus argumentos. AI Scholar escucha, perfecciona su réplica en tiempo real y responde.',
-      archiveTitle: 'Tu Registro de Debates',
-      openFloor: 'Abrir Sesión',
-      micSpeak: 'Micrófono — Mantén para hablar',
-      endJudge: 'Finalizar y Juzgar',
-      copyBtn: 'Copiar',
-      readAloud: 'Leer en Voz Alta',
-      printed: 'IMPRESO',
-      composing: 'COMPONIENDO',
-      socraticHead: 'LOFFI DESAFÍA TU LÓGICA — Responde antes de continuar',
-      socraticSubmit: 'Reforzar argumentos → Continuar',
-      fallacyAlertHead: '⚠ Alerta de Falacia Lógica — Revisa Antes de Argumentar',
-    }
-  }
 };
 
 let currentLang = 'en';
@@ -547,7 +368,7 @@ function buildCatStrip() {
     const btn = document.createElement('button');
     btn.className = 'cat-btn' + (c.id === S.currentCat ? ' active' : '');
     btn.dataset.id = c.id;
-    const label = currentLang === 'ur' ? (c.label_ur || c.label) : currentLang === 'ar' ? (c.label_ar || c.label) : c.label;
+    const label = c.label;
     btn.innerHTML = `<span class="cat-accent" style="background:${c.accent}"></span>${label}`;
     btn.onclick = () => renderCat(c.id);
     strip.appendChild(btn);
@@ -560,7 +381,7 @@ function buildCatStrip() {
 function renderCat(catId) {
   S.currentCat = catId;
   const cat = CATS.find(c => c.id === catId);
-  const catLabel = currentLang === 'ur' ? (cat.label_ur || cat.label) : currentLang === 'ar' ? (cat.label_ar || cat.label) : cat.label;
+  const catLabel = cat.label;
   
   document.querySelectorAll('.cat-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.id === catId));
@@ -573,7 +394,7 @@ function renderCat(catId) {
   grid.innerHTML = `
     <div class="sub-strip" id="sub-strip" style="display:flex;gap:0;flex-wrap:wrap;border-bottom:1px solid var(--rule-heavy);margin-bottom:.8rem;padding-bottom:0;grid-column:1/-1;">
       ${cat.subs.map((sub,i) => {
-        const subLabel = currentLang === 'ur' ? (sub.label_ur || sub.label) : currentLang === 'ar' ? (sub.label_ar || sub.label) : sub.label;
+        const subLabel = sub.label;
         return `<button class="sub-btn${i===0?' sub-active':''}" data-sub="${sub.id}" onclick="renderSub('${catId}','${sub.id}')">
           ${subLabel}
         </button>`;
@@ -608,7 +429,7 @@ function renderSub(catId, subId) {
   S.currentSub = subId;
   const cat = CATS.find(c => c.id === catId);
   const sub = cat.subs.find(s => s.id === subId);
-  const subLabel = currentLang === 'ur' ? (sub.label_ur || sub.label) : currentLang === 'ar' ? (sub.label_ar || sub.label) : sub.label;
+  const subLabel = sub.label;
 
   // Update active sub pill
   document.querySelectorAll('.sub-btn').forEach(b =>
@@ -620,15 +441,15 @@ function renderSub(catId, subId) {
     `<option value="${esc(s)}">${esc(s.split(' (')[0])}</option>`).join('');
   S.source = sub.sources[0];
   const fn = document.getElementById('source-footnote');
-  const sourceStr = currentLang === 'ur' ? 'کے ماخذ' : currentLang === 'ar' ? 'مصادر' : 'Sources for';
+  const sourceStr = 'Sources for';
   if (fn) fn.innerHTML = `<strong>${sourceStr} ${subLabel}:</strong> ${sub.sources.join(' &nbsp;·&nbsp; ')}`;
 
   // Render 6 topic cards
   const stg = document.getElementById('sub-topic-grid');
   if (!stg) return;
   stg.innerHTML = sub.topics.map((t, i) => {
-    const title = currentLang === 'ur' ? (t.title_ur || t.title) : currentLang === 'ar' ? (t.title_ar || t.title) : t.title;
-    const tSub = currentLang === 'ur' ? (t.sub_ur || t.sub) : currentLang === 'ar' ? (t.sub_ar || t.sub) : t.sub;
+    const title = t.title;
+    const tSub = t.sub;
     return `
       <button type="button" class="topic-card" id="tc-${catId}-${subId}-${i}" aria-pressed="false" onclick="selectTopic('${catId}','${subId}',${i})">
         <span class="tc-label" style="color:${cat.accent};">${esc(subLabel).toUpperCase()}</span>
@@ -809,7 +630,7 @@ async function speak(text) {
     }
     const u = new SpeechSynthesisUtterance(clean);
     u.lang = lang.voiceLang;
-    u.rate = currentLang === 'ar' || currentLang === 'ur' ? 0.85 : 0.95;
+    u.rate = 0.95;
     const match = voices.find(v => v.lang === lang.voiceLang)
       || voices.find(v => v.lang.startsWith(lang.code));
     if (match) u.voice = match;

@@ -53,12 +53,6 @@
       <button class="nav-item settings-btn" onclick="openSettings()" title="API Settings" aria-label="API settings">
         <span aria-hidden="true">⚙</span>
       </button>
-      <div class="lang-switcher" id="lang-switcher" role="group" aria-label="Interface language">
-        <button class="lang-btn active" data-lang="en" onclick="switchLang('en')" title="English" aria-label="English" aria-pressed="true"><span aria-hidden="true">🇬🇧</span></button>
-        <button class="lang-btn" data-lang="ar" onclick="switchLang('ar')" title="العربية" aria-label="العربية — Arabic" aria-pressed="false"><span aria-hidden="true">🇸🇦</span></button>
-        <button class="lang-btn" data-lang="ur" onclick="switchLang('ur')" title="اردو" aria-label="اردو — Urdu" aria-pressed="false"><span aria-hidden="true">🇵🇰</span></button>
-        <button class="lang-btn" data-lang="es" onclick="switchLang('es')" title="Español" aria-label="Español — Spanish" aria-pressed="false"><span aria-hidden="true">🇪🇸</span></button>
-      </div>
     </nav>
   </div>
 </header>
@@ -136,18 +130,6 @@
             <option value="20-50" selected>Brief — 20–50 words</option>
             <option value="120-180">Standard — 120–180 words</option>
             <option value="220-280">Deep — 220–280 words</option>
-          </select>
-        </div>
-        <div>
-          <label class="cf-label" id="cf-lang-label" for="sel-lang" style="display:none;">Language</label>
-          <select id="sel-lang" style="display:none;">
-            <option value="">English</option>
-            <option value="Write your entire response in Arabic. ">Arabic</option>
-            <option value="Write your entire response in Spanish. ">Spanish</option>
-            <option value="Write your entire response in French. ">French</option>
-            <option value="Write your entire response in Urdu. ">Urdu</option>
-            <option value="Write your entire response in Hindi. ">Hindi</option>
-            <option value="Write your entire response in German. ">German</option>
           </select>
         </div>
         <div>
