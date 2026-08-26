@@ -666,7 +666,7 @@ async function runPipeline() {
   document.getElementById('pipeline').innerHTML='';
   resetTele();
 
-  setTicker('LUFIALLOLA COMPOSING DISPATCH...');
+  setTicker('LUFI COMPOSING DISPATCH...');
 
   try {
     // L0 FALLACY
@@ -1437,11 +1437,11 @@ function initAvatar() {
     const mh=S.isSpeaking?Math.abs(Math.sin(f*.2))*6+2:2;
     ctx.fillStyle=INK_HEX;
     ctx.beginPath();ctx.ellipse(50,62,9,mh,0,0,Math.PI);ctx.fill();
-    // "LUFIALLOLA" text stamp
+    // "LUFI" text stamp
     ctx.fillStyle=RED_HEX;
     ctx.font='bold 7px "Barlow Condensed",sans-serif';
     ctx.textAlign='center';
-    ctx.fillText('LUFIALLOLA',50,93);
+    ctx.fillText('LUFI',50,93);
     requestAnimationFrame(draw);
   }
   draw();
