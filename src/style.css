@@ -130,6 +130,20 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
+/* Fixed background mark — image is pre-rendered at 25% opacity so it reads
+   as a watermark without fighting article text on top of it. */
+.page-watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(70vw, 640px);
+  height: auto;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* ============================================================
    MASTHEAD
    ============================================================ */
@@ -223,6 +237,13 @@ body {
   color: inherit;
   display: block;
   width: 100%;
+}
+
+.masthead-logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  margin: 0 auto 6px;
 }
 
 .paper-name {
